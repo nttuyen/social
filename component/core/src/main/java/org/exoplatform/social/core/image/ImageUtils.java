@@ -114,8 +114,11 @@ public class ImageUtils {
         return null;
       }
       
-      if (height <= minSize)
-        height = image.getHeight() * width / image.getWidth();
+      if (height < minSize) {
+          height = image.getHeight() * width / image.getWidth();
+      } else if (height == minSize){
+          height = image.getHeight();
+      }
       else if (width <= minSize)
         width = image.getWidth() * height / image.getHeight();
 
