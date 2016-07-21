@@ -199,22 +199,25 @@ public class PeopleRestService implements ResourceContainer{
 
       List<Space> exclusions = new ArrayList<Space>();
       // Includes spaces the current user is member.
-      long remain = SUGGEST_LIMIT - (nameList.getNames() != null ? nameList.getNames().size() : 0);
+      long remain = SUGGEST_LIMIT - (nameList.getOptions() != null ? nameList.getOptions().size() : 0);
       if (remain > 0) {
         SpaceFilter spaceFilter = new SpaceFilter();
         spaceFilter.setSpaceNameSearchCondition(name);
         ListAccess<Space> list = getSpaceService().getMemberSpacesByFilter(currentUser, spaceFilter);
         Space[] spaces = list.load(0, (int) remain);
         for (Space s : spaces) {
-          nameList.addName("space::" + s.getPrettyName());
-          nameList.addFullName(s.getDisplayName());
-          nameList.addAvatar(s.getAvatarUrl());
+          Option opt = new Option();
+          opt.setType("space");
+          opt.setValue("space::" + s.getPrettyName());
+          opt.setText(s.getDisplayName());
+          opt.setAvatarUrl(s.getAvatarUrl());
+          nameList.addOption(opt);
           exclusions.add(s);
         }
       }
 
       // Adding all non hidden spaces.
-      remain = SUGGEST_LIMIT - (nameList.getNames() != null ? nameList.getNames().size() : 0);
+      remain = SUGGEST_LIMIT - (nameList.getOptions() != null ? nameList.getOptions().size() : 0);
       if (remain > 0) {
         SpaceFilter spaceFilter = new SpaceFilter();
         spaceFilter.setSpaceNameSearchCondition(name);
@@ -222,13 +225,16 @@ public class PeopleRestService implements ResourceContainer{
         ListAccess<Space> list = getSpaceService().getVisibleSpacesWithListAccess(currentUser, spaceFilter);
         Space[] spaces = list.load(0, (int) remain);
         for (Space s : spaces) {
-          nameList.addName("space::" + s.getPrettyName());
-          nameList.addFullName(s.getDisplayName());
-          nameList.addAvatar(s.getAvatarUrl());
+          Option opt = new Option();
+          opt.setType("space");
+          opt.setValue("space::" + s.getPrettyName());
+          opt.setText(s.getDisplayName());
+          opt.setAvatarUrl(s.getAvatarUrl());
+          nameList.addOption(opt);
         }
       }
 
-      remain = SUGGEST_LIMIT - (nameList.getNames() != null ? nameList.getNames().size() : 0);
+      remain = SUGGEST_LIMIT - (nameList.getOptions() != null ? nameList.getOptions().size() : 0);
       if (remain > 0) {
         identityFilter.setExcludedIdentityList(excludedIdentityList);
         ListAccess<Identity> listAccess = getIdentityManager().getIdentitiesByProfileFilter(OrganizationIdentityProvider.NAME, identityFilter, false);
@@ -676,39 +682,40 @@ public class PeopleRestService implements ResourceContainer{
     Profile p = identityManager.getProfile(identity);
     return p == null ? null : p.getAvatarUrl();
   }
-
-  private void addToNameList(Identity currentIdentity, List<Relationship> identitiesHasRelation, UserNameList nameList) {
-    for (Relationship relationship : identitiesHasRelation) {
-      Identity identity = relationship.getPartner(currentIdentity);
-      String fullName = identity.getProfile().getFullName();
-      nameList.addName(fullName);
-      nameList.addAvatar(getAvatarURL(identity));
-    }
-  }
   
   private void addToNameList(UserNameList nameList, Identity ...identities) {
     for (Identity identity : identities) {
       String fullName = identity.getProfile().getFullName();
-      nameList.addName(fullName);
-      nameList.addAvatar(getAvatarURL(identity));
+      Option opt = new Option();
+      opt.setType("user");
+      opt.setValue(fullName);
+      opt.setAvatarUrl(getAvatarURL(identity));
+      nameList.addOption(opt);
     }
   }
   
-  private void addSpaceUserToList (List<Identity> identities, UserNameList nameList,
+  private void addSpaceUserToList (List<Identity> identities, UserNameList options,
                                    Space space, String typeOfRelation) throws SpaceException {
     SpaceService spaceSrv = getSpaceService(); 
     for (Identity identity : identities) {
       String fullName = identity.getProfile().getFullName();
       String userName = (String) identity.getProfile().getProperty(Profile.USERNAME); 
       if (SPACE_MEMBER.equals(typeOfRelation) && spaceSrv.isMember(space, userName)) {
-        nameList.addName(fullName);
-        nameList.addAvatar(getAvatarURL(identity));
+        Option opt = new Option();
+        opt.setType("user");
+        opt.setValue(fullName);
+        opt.setText(fullName);
+        opt.setAvatarUrl(getAvatarURL(identity));
+        options.addOption(opt);
         continue;
       } else if (USER_TO_INVITE.equals(typeOfRelation) && !spaceSrv.isInvited(space, userName)
                  && !spaceSrv.isPending(space, userName) && !spaceSrv.isMember(space, userName)) {
-        nameList.addName(userName);
-        nameList.addFullName(fullName);
-        nameList.addAvatar(getAvatarURL(identity));
+        Option opt = new Option();
+        opt.setType("user");
+        opt.setValue(userName);
+        opt.setText(fullName);
+        opt.setAvatarUrl(getAvatarURL(identity));
+        options.addOption(opt);
       }
     }
   }
@@ -841,7 +848,46 @@ public class PeopleRestService implements ResourceContainer{
       this.type = type;
     }
   }
-  
+
+  static public class Option {
+    private String type;
+    private String value;
+    private String text;
+    private String avatarUrl;
+
+    public String getType() {
+      return type;
+    }
+
+    public void setType(String type) {
+      this.type = type;
+    }
+
+    public String getValue() {
+      return value;
+    }
+
+    public void setValue(String value) {
+      this.value = value;
+    }
+
+    public String getText() {
+      return text;
+    }
+
+    public void setText(String text) {
+      this.text = text;
+    }
+
+    public String getAvatarUrl() {
+      return avatarUrl;
+    }
+
+    public void setAvatarUrl(String avatarUrl) {
+      this.avatarUrl = avatarUrl;
+    }
+  }
+
   /**
    * UserNameList class
    * 
@@ -850,74 +896,25 @@ public class PeopleRestService implements ResourceContainer{
    */
   @XmlRootElement
   static public class UserNameList {
-    private List<String> _names;
-    private List<String> _fullNames;
-    private List<String> _avatars;
-    /**
-     * Sets user name list
-     * @param names name list
-     */
-    public void setNames(List<String> names) {
-      this._names = names; 
-    }
-    
-    /**
-     * Gets user name list
-     * @return user name list
-     */
-    public List<String> getNames() { 
-      return _names; 
+    private List<Option> options;
+
+    public List<Option> getOptions() {
+      return options;
     }
 
-    /**
-     * Sets user full name list
-     * @param fullNames list
-     */
-    public void setFullNames(List<String> fullNames) {
-      this._fullNames = fullNames;
+    public void setOptions(List<Option> options) {
+      this.options = options;
     }
 
-    /**
-     * Gets user full name list
-     * @return _fullNames list
-     */
-    public List<String> getFullNames() { return _fullNames; }
-
-    public List<String> getAvatars() {
-      return _avatars;
-    }
-
-    public void setAvatars(List<String> _avatars) {
-      this._avatars = _avatars;
-    }
-
-    /**
-     * Add name to user name list
-     * @param name
-     */
-    public void addName(String name) {
-      if (_names == null) {
-        _names = new ArrayList<String>();
+    public void addOption(Option opt) {
+      if (opt == null) {
+        throw new IllegalArgumentException("Option can not be NULL");
       }
-      _names.add(name);
-    }
 
-    /**
-     * Add the user full name to fullNames list
-     * @param fullName
-     */
-    public void addFullName(String fullName) {
-      if (_fullNames == null) {
-        _fullNames = new ArrayList<String>();
+      if (options == null) {
+        options = new ArrayList<Option>();
       }
-      _fullNames.add(fullName);
-    }
-
-    public void addAvatar(String avatar) {
-      if (_avatars == null) {
-        _avatars = new ArrayList<>();
-      }
-      _avatars.add(avatar);
+      options.add(opt);
     }
   }
 
