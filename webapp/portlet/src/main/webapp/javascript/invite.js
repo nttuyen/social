@@ -24,6 +24,11 @@
                 },
                 create: true
             });
+        },
+
+        notify: function(selector, anchor) {
+            $(anchor).append($(selector));
+            $(anchor).css("border", "1px solid red");
         }
     };
 

@@ -107,7 +107,6 @@ public class UIMembersPortlet extends UIPortletApplication {
    * @throws Exception
    */
   public UIMembersPortlet() throws Exception {    
-    addChild(UINotify.class, null, null);
     uiSearchMemberOfSpace = createUIComponent(UIProfileUserSearch.class, null, "UIProfileUserSearch");
     uiSearchMemberOfSpace.setTypeOfRelation(SPACE_MEMBER);
     uiSearchMemberOfSpace.setSpaceURL(getSpace().getUrl());

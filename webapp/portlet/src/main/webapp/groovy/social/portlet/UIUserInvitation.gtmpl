@@ -5,6 +5,24 @@ String restUrl = uicomponent.getRestURL();
 
 %>
 <div class="uiUserInvitation">
+  <%
+  def rcontext = _ctx.getRequestContext();
+  def jsManager = rcontext.getJavascriptManager();
+  def requireJs = jsManager.getRequireJS();
+  %>
+  <div class="UINotify">
+    <%
+    if (uicomponent.getMessage() != null) {
+      %>
+      <%=uicomponent.getMessage();%>
+      <%
+      uicomponent.addMessage(null);
+      requireJs.require("SHARED/invite", "invite");
+      requireJs.addScripts("invite.notify('.UINotify', '#NotifyAnchor');");
+    }
+    %>
+  </div>
+
   <% uiform.begin();%>
   <div class="uiGrayLightBox">
 		<div style="float: right"><button class="btn" type="button" onclick="$inviteAction">Invite</button></div>
@@ -14,10 +32,6 @@ String restUrl = uicomponent.getRestURL();
   </div>
   <% uiform.end();%>
   <%
-   def rcontext = _ctx.getRequestContext();
-   def jsManager = rcontext.getJavascriptManager();
-   def requireJs = jsManager.getRequireJS();
-   
    requireJs.require("SHARED/invite", "invite");
    requireJs.addScripts("invite.build('user', '$restUrl');");
   %>

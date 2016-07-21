@@ -53,6 +53,7 @@ jsManager.require("SHARED/jquery", "jq")
      .addScripts("socialUtil.addDynamicItemLayout('spaceMemberListBox');");
 %>
 <div class="uiSocApplication uiMembersPortlet" id="$uicomponent.id">
+  <div id="NotifyAnchor"></div>
   <h3 class="uiInputInfo">$spaceName</h3>
   <span>$visibility</span>
   <h4 class="titleWithBorder mgB220">$administratorLabel</h4>

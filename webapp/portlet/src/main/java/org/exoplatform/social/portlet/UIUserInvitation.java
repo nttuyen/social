@@ -40,7 +40,6 @@ import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
 import org.exoplatform.social.webui.Utils;
 import org.exoplatform.web.application.RequestContext;
-import org.exoplatform.webui.application.WebuiRequestContext;
 import org.exoplatform.webui.config.annotation.ComponentConfig;
 import org.exoplatform.webui.config.annotation.EventConfig;
 import org.exoplatform.webui.core.lifecycle.UIFormLifecycle;
@@ -60,6 +59,7 @@ public class UIUserInvitation extends UIForm {
   private static final String USER = "user";
   private SpaceService spaceService;
   private String spaceUrl;
+  private String msg;
 
   public UIUserInvitation() throws Exception {
     addUIFormInput(new UIFormStringInput(USER, null, null));
@@ -90,11 +90,11 @@ public class UIUserInvitation extends UIForm {
   }
 
   public void addMessage(String msg) {
-    UIMembersPortlet parent = getAncestorOfType(UIMembersPortlet.class);
-    UINotify notify = parent.getChild(UINotify.class);
-    notify.notify(msg);
-    WebuiRequestContext context = WebuiRequestContext.getCurrentInstance();
-    context.addUIComponentToUpdateByAjax(notify);
+    this.msg = msg;
+  }
+
+  public String getMessage() {
+    return this.msg;
   }
 
   /**
@@ -217,6 +217,7 @@ public class UIUserInvitation extends UIForm {
       String value = input.getValue();
       if (value == null || value.trim().isEmpty()) {
         uicomponent.addMessage("Please enter a valid user or space name.");
+        return;
       }
 
       SpaceService spaceService = uicomponent.getApplicationComponent(SpaceService.class);
@@ -258,7 +259,7 @@ public class UIUserInvitation extends UIForm {
           }
 
           if (usersForInviting.size() == 1) {
-            uicomponent.addMessage("FULL NAME has been invited to this space.");
+            uicomponent.addMessage(usersForInviting.get(0) + " has been invited to this space.");
           } else {
             uicomponent.addMessage(usersForInviting.size() + " users have been invited to this space.");
           }
