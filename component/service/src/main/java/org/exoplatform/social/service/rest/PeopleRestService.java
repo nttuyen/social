@@ -182,7 +182,7 @@ public class PeopleRestService implements ResourceContainer{
     } else if (SPACE_MEMBER.equals(typeOfRelation)) {  // Use in search space member
       List<Identity> identities = Arrays.asList(getIdentityManager().getIdentitiesByProfileFilter(OrganizationIdentityProvider.NAME, identityFilter, false).load(0, (int)SUGGEST_LIMIT));
       Space space = getSpaceService().getSpaceByUrl(spaceURL);
-      addSpaceUserToList(identities, nameList, space, typeOfRelation);
+      addSpaceUserToList(identities, nameList, space, typeOfRelation, 0);
     } else if (USER_TO_INVITE.equals(typeOfRelation)) {
       Space space = getSpaceService().getSpaceByUrl(spaceURL);
 
@@ -192,7 +192,7 @@ public class PeopleRestService implements ResourceContainer{
         int size = connections.getSize();
         Identity[] identities = connections.load(0, size < SUGGEST_LIMIT ? size : (int)SUGGEST_LIMIT);
         for (Identity id : identities) {
-          addSpaceUserToList(Arrays.asList(id), nameList, space, typeOfRelation);
+          addSpaceUserToList(Arrays.asList(id), nameList, space, typeOfRelation, 1);
           excludedIdentityList.add(id);
         }
       }
@@ -211,6 +211,7 @@ public class PeopleRestService implements ResourceContainer{
           opt.setValue("space::" + s.getPrettyName());
           opt.setText(s.getDisplayName());
           opt.setAvatarUrl(s.getAvatarUrl());
+          opt.setOrder(2);
           nameList.addOption(opt);
           exclusions.add(s);
         }
@@ -230,6 +231,7 @@ public class PeopleRestService implements ResourceContainer{
           opt.setValue("space::" + s.getPrettyName());
           opt.setText(s.getDisplayName());
           opt.setAvatarUrl(s.getAvatarUrl());
+          opt.setOrder(3);
           nameList.addOption(opt);
         }
       }
@@ -239,7 +241,7 @@ public class PeopleRestService implements ResourceContainer{
         identityFilter.setExcludedIdentityList(excludedIdentityList);
         ListAccess<Identity> listAccess = getIdentityManager().getIdentitiesByProfileFilter(OrganizationIdentityProvider.NAME, identityFilter, false);
         List<Identity> identities = Arrays.asList(listAccess.load(0, (int) remain));
-        addSpaceUserToList(identities, nameList, space, typeOfRelation);
+        addSpaceUserToList(identities, nameList, space, typeOfRelation, 4);
       }
 
     } else { // Identities that match the keywords.
@@ -695,28 +697,26 @@ public class PeopleRestService implements ResourceContainer{
   }
   
   private void addSpaceUserToList (List<Identity> identities, UserNameList options,
-                                   Space space, String typeOfRelation) throws SpaceException {
+                                   Space space, String typeOfRelation, int order) throws SpaceException {
     SpaceService spaceSrv = getSpaceService(); 
     for (Identity identity : identities) {
       String fullName = identity.getProfile().getFullName();
       String userName = (String) identity.getProfile().getProperty(Profile.USERNAME); 
+      Option opt = new Option();
       if (SPACE_MEMBER.equals(typeOfRelation) && spaceSrv.isMember(space, userName)) {
-        Option opt = new Option();
         opt.setType("user");
         opt.setValue(fullName);
         opt.setText(fullName);
         opt.setAvatarUrl(getAvatarURL(identity));
-        options.addOption(opt);
-        continue;
       } else if (USER_TO_INVITE.equals(typeOfRelation) && !spaceSrv.isInvited(space, userName)
                  && !spaceSrv.isPending(space, userName) && !spaceSrv.isMember(space, userName)) {
-        Option opt = new Option();
         opt.setType("user");
         opt.setValue(userName);
         opt.setText(fullName);
         opt.setAvatarUrl(getAvatarURL(identity));
-        options.addOption(opt);
       }
+      opt.setOrder(order);
+      options.addOption(opt);
     }
   }
   
@@ -854,6 +854,15 @@ public class PeopleRestService implements ResourceContainer{
     private String value;
     private String text;
     private String avatarUrl;
+    private int order;
+
+    public int getOrder() {
+      return order;
+    }
+
+    public void setOrder(int order) {
+      this.order = order;
+    }
 
     public String getType() {
       return type;

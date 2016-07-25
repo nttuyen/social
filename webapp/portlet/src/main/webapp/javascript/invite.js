@@ -22,7 +22,22 @@
                         }
                     });
                 },
-                create: true
+                create: true,
+                render: {
+                    option: function(item, escape) {
+                        if (item.avatarUrl == null) {
+                            if (item.type == "user") {
+                                item.avatarUrl = '/eXoSkin/skin/images/system/UserAvtDefault.png';
+                            } else {
+                                item.avatarUrl = '/eXoSkin/skin/images/system/SpaceAvtDefault.png';
+                            }
+                        }
+                        return '<div class="option">' +
+                        '<img width="20px" height="20px" src="' + item.avatarUrl + '"> ' +
+                        escape(item.text) + '</div>';
+                    }
+                },
+                sortField: [{field: 'order'}, {field: '$score'}]
             });
         },
 
