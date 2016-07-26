@@ -19,6 +19,7 @@ package org.exoplatform.social.webui.composer;
 
 import java.util.List;
 
+import org.exoplatform.commons.utils.HTMLSanitizer;
 import org.exoplatform.container.PortalContainer;
 import org.exoplatform.social.core.activity.model.ExoSocialActivity;
 import org.exoplatform.social.webui.Utils;
@@ -66,6 +67,8 @@ public class UIComposer extends UIForm {
 
   private static final String HTML_ATTRIBUTE_TITLE = "title";
   private static final String COMPOSER_TEXT_AREA_INPUT = "composerInput";
+  private static final String HTML_AT_SYMBOL_PATTERN = "@";
+  private static final String HTML_AT_SYMBOL_ESCAPED_PATTERN = "&#64;";
   
   /**
    * Constructor
@@ -196,7 +199,7 @@ public class UIComposer extends UIForm {
       
       //get posted message
       UIFormTextAreaInput textAreaInput = uiComposer.getUIFormTextAreaInput(COMPOSER_TEXT_AREA_INPUT);
-      String message = textAreaInput.getValue();
+      String message = HTMLSanitizer.sanitize(textAreaInput.getValue()).replaceAll(HTML_AT_SYMBOL_ESCAPED_PATTERN,HTML_AT_SYMBOL_PATTERN);
       textAreaInput.setValue("");
       //
       message = (message == null || 
