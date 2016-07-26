@@ -21,13 +21,6 @@
   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
   xsi:schemaLocation="http://www.gatein.org/xml/ns/gatein_resources_1_3 http://www.gatein.org/xml/ns/gatein_resources_1_3"
   xmlns="http://www.gatein.org/xml/ns/gatein_resources_1_3">
-  <portlet-skin>
-    <application-name>social-portlet</application-name>
-    <portlet-name>MembersPortlet</portlet-name>
-    <skin-name>Default</skin-name>
-    <css-path>/DefaultSkin.css</css-path>
-  </portlet-skin>
-
   <module>
     <name>selectize</name>
     <script>

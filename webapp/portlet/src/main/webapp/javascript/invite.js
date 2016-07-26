@@ -26,10 +26,10 @@
                 render: {
                     option: function(item, escape) {
                         if (item.avatarUrl == null) {
-                            if (item.type == "user") {
-                                item.avatarUrl = '/eXoSkin/skin/images/system/UserAvtDefault.png';
-                            } else {
+                            if (item.type == "space") {
                                 item.avatarUrl = '/eXoSkin/skin/images/system/SpaceAvtDefault.png';
+                            } else {
+                                item.avatarUrl = '/eXoSkin/skin/images/system/UserAvtDefault.png';
                             }
                         }
                         return '<div class="option">' +
@@ -43,7 +43,6 @@
 
         notify: function(selector, anchor) {
             $(anchor).append($(selector));
-            $(anchor).css("border", "1px solid red");
         }
     };
 

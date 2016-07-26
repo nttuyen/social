@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, see<http://www.gnu.org/licenses/>.
  */
-package org.exoplatform.social.portlet;
+package org.exoplatform.social.webui;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -38,7 +38,6 @@ import org.exoplatform.social.core.manager.IdentityManager;
 import org.exoplatform.social.core.profile.ProfileFilter;
 import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
-import org.exoplatform.social.webui.Utils;
 import org.exoplatform.web.application.RequestContext;
 import org.exoplatform.webui.config.annotation.ComponentConfig;
 import org.exoplatform.webui.config.annotation.EventConfig;
@@ -50,7 +49,7 @@ import org.exoplatform.webui.form.UIFormStringInput;
 
 @ComponentConfig(
   lifecycle = UIFormLifecycle.class,
-  template = "app:/groovy/social/portlet/UIUserInvitation.gtmpl",
+  template = "war:/groovy/social/webui/UIUserInvitation.gtmpl",
   events = {
       @EventConfig(listeners = UIUserInvitation.InviteActionListener.class)
   }
@@ -247,10 +246,10 @@ public class UIUserInvitation extends UIForm {
         }
 
         if (usersForInviting.size() > 0) {
+          ExoContainer container = ExoContainerContext.getCurrentContainer();
+          IdentityManager idm = (IdentityManager) container.getComponentInstanceOfType(IdentityManager.class);
           for (String userName : usersForInviting) {
             // create Identity and Profile nodes if not exist
-            ExoContainer container = ExoContainerContext.getCurrentContainer();
-            IdentityManager idm = (IdentityManager) container.getComponentInstanceOfType(IdentityManager.class);
             Identity identity = idm.getOrCreateIdentity(OrganizationIdentityProvider.NAME, userName, false);
             if (identity != null) {
               // add userName to InvitedUser list of the space
@@ -259,7 +258,8 @@ public class UIUserInvitation extends UIForm {
           }
 
           if (usersForInviting.size() == 1) {
-            uicomponent.addMessage(usersForInviting.get(0) + " has been invited to this space.");
+            Identity identity = idm.getOrCreateIdentity(OrganizationIdentityProvider.NAME, usersForInviting.get(0), true);
+            uicomponent.addMessage(identity.getProfile().getFullName() + " has been invited to this space.");
           } else {
             uicomponent.addMessage(usersForInviting.size() + " users have been invited to this space.");
           }

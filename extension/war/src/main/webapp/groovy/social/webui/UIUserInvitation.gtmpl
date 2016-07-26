@@ -10,18 +10,18 @@ String restUrl = uicomponent.getRestURL();
   def jsManager = rcontext.getJavascriptManager();
   def requireJs = jsManager.getRequireJS();
   %>
-  <div class="UINotify">
     <%
     if (uicomponent.getMessage() != null) {
       %>
+      <div class="UINotify alert alert-success">
       <%=uicomponent.getMessage();%>
+      </div>
       <%
       uicomponent.addMessage(null);
       requireJs.require("SHARED/invite", "invite");
       requireJs.addScripts("invite.notify('.UINotify', '#NotifyAnchor');");
     }
     %>
-  </div>
 
   <% uiform.begin();%>
   <div class="uiGrayLightBox">
