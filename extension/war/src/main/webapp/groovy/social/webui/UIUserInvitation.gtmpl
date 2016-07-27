@@ -18,7 +18,7 @@ String restUrl = uicomponent.getRestURL();
       </div>
       <%
       uicomponent.addMessage(null);
-      requireJs.require("SHARED/invite", "invite");
+      requireJs.require("SHARED/userInvitation", "invite");
       requireJs.addScripts("invite.notify('.UINotify', '#NotifyAnchor');");
     }
     %>
@@ -32,7 +32,7 @@ String restUrl = uicomponent.getRestURL();
   </div>
   <% uiform.end();%>
   <%
-   requireJs.require("SHARED/invite", "invite");
+   requireJs.require("SHARED/userInvitation", "invite");
    requireJs.addScripts("invite.build('user', '$restUrl');");
   %>
 </div>
