@@ -894,6 +894,8 @@ public class BaseUIActivity extends UIForm {
       }
 
       uiFormComment.reset();
+      //--- Processing outcome here aims to avoid escaping '@' symbol while preventing any undesirable side effects due to CSS sanitization.
+      //--- The goal is to avoid escape '@' occurrences in microblog application, this enables to keep mention feature working as expected in the specification
       uiActivity.saveComment(requestContext.getRemoteUser(), HTMLSanitizer.sanitize(message).replaceAll(HTML_AT_SYMBOL_ESCAPED_PATTERN, HTML_AT_SYMBOL_PATTERN));
       uiActivity.setCommentFormFocused(true);
       requestContext.addUIComponentToUpdateByAjax(uiActivity);
