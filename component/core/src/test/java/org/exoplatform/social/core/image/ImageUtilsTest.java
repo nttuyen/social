@@ -17,7 +17,13 @@
 package org.exoplatform.social.core.image;
 
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.io.InputStream;
+import javax.imageio.ImageIO;
 import junit.framework.TestCase;
+import org.exoplatform.social.core.model.AvatarAttachment;
 
 public class ImageUtilsTest extends TestCase {
 
@@ -36,5 +42,27 @@ public class ImageUtilsTest extends TestCase {
     assertEquals("_100x0", postfix);
   }
 
-  // TODO: Write unit test for function
+  public void testCreateResizedAvatarAttachment(){
+      InputStream inputStream = getClass().getResourceAsStream("/eXo-Social.png");
+      int width = 200;
+      String avatarId = "null";
+      String avatarMimeType = "image/jpeg";
+      String avatarFileName = "eXo-Social.png";
+      String avatarWorkspace = "null";
+      BufferedImage image = ImageUtils.image;
+      try {
+          image = ImageIO.read(inputStream);
+      } catch (IOException e) {
+          e.printStackTrace();
+      }
+      int height = image.getHeight() * width / image.getWidth();
+      image = org.apache.shindig.gadgets.rewrite.image.ImageUtils.getScaledInstance(image, width, height, RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR, false, BufferedImage.TYPE_INT_RGB);
+      int avatarWidth = image.getWidth();
+      int avatarHeight = image.getHeight();
+      AvatarAttachment avatar = ImageUtils.createResizedAvatarAttachment(inputStream, width, height, avatarId, avatarFileName, avatarMimeType, avatarWorkspace);
+      assertNotNull(avatar);
+      assertEquals(avatarWidth, width);
+      assertEquals(avatarHeight, height);
+  }
+
 }

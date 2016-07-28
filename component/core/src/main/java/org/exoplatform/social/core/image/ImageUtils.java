@@ -39,6 +39,7 @@ public class ImageUtils {
 
   public static final String GIF_EXTENDSION          = "gif";
   private static final Log LOG = ExoLogger.getLogger(ImageUtils.class);
+  public static BufferedImage image = null;
 
   /**
    * @param str Make string params not null
@@ -101,8 +102,6 @@ public class ImageUtils {
                                                                String avatarWorkspace) {
     try {
       MimeTypeResolver mimeTypeResolver = new MimeTypeResolver();
-
-      BufferedImage image = null;
       int minSize = 0;
       String extension = mimeTypeResolver.getExtension(avatarMimeType);
       // TODO: Resize gif image. Now we skip gif because we can't resize it now
@@ -114,10 +113,8 @@ public class ImageUtils {
         return null;
       }
       
-      if (height < minSize) {
+      if (height <= minSize) {
           height = image.getHeight() * width / image.getWidth();
-      } else if (height == minSize){
-          height = image.getHeight();
       }
       else if (width <= minSize)
         width = image.getWidth() * height / image.getHeight();
@@ -130,30 +127,6 @@ public class ImageUtils {
                                                  RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR,
                                                  false,
                                                  BufferedImage.TYPE_INT_RGB);
-
-      int imgWidth = image.getWidth();
-      int imgHeight = image.getHeight();
-      
-      if (imgWidth != imgHeight) { // in case of image has width and height not the same
-        int x,y,w,h;
-        int cropDimension = imgWidth > imgHeight ? imgHeight : imgWidth;
-        int offset = (cropDimension == imgWidth) ? imgHeight - cropDimension : imgWidth - cropDimension;
-        
-        if (imgWidth < imgHeight) {
-          x = 0;
-          y = (int)(offset/2);
-          w = imgWidth;
-          h = imgHeight - offset;
-        } else {
-          x = (int)(offset/2);
-          y = 0;
-          w = imgWidth - offset;
-          h = imgHeight;
-        }
-        
-        image = image.getSubimage(x, y, w, h);
-      }
-      
       ImageIO.write(image, extension, tmp);
       
       // Create new avatar attachment
