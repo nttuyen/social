@@ -2,6 +2,7 @@
 String inviteAction = uicomponent.event("Invite") + "; return false;";
 
 String restUrl = uicomponent.getRestURL();
+String value = uicomponent.getValue();
 
 %>
 <div class="uiUserInvitation">
@@ -33,6 +34,6 @@ String restUrl = uicomponent.getRestURL();
   <% uiform.end();%>
   <%
    requireJs.require("SHARED/userInvitation", "invite");
-   requireJs.addScripts("invite.build('user', '$restUrl');");
+   requireJs.addScripts("invite.build('user', '$restUrl', '$value');");
   %>
 </div>

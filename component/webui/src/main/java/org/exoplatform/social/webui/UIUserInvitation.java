@@ -96,6 +96,10 @@ public class UIUserInvitation extends UIForm {
     return this.msg;
   }
 
+  public String getValue() {
+    return getUIStringInput(USER).getValue();
+  }
+
   /**
    * Validates invited users for checking if any error happens.
    *

@@ -186,6 +186,39 @@ public class PeopleRestService implements ResourceContainer{
     } else if (USER_TO_INVITE.equals(typeOfRelation)) {
       Space space = getSpaceService().getSpaceByUrl(spaceURL);
 
+      // This is for pre-loading data
+      if (name != null && name.contains(",")) {
+        String[] items = name.split(",");
+        for (String item : items) {
+          Option opt = new Option();
+          if (item.startsWith("space::")) {
+            Space s = getSpaceService().getSpaceByPrettyName(item.substring(7));
+            opt.setType("space");
+            opt.setValue("space::" + s.getPrettyName());
+            opt.setText(s.getDisplayName());
+            opt.setAvatarUrl(s.getAvatarUrl());
+            opt.setOrder(2);
+          } else {
+            Identity identity = getIdentityManager().getOrCreateIdentity(
+                                                     OrganizationIdentityProvider.NAME, item, false);
+            opt.setType("user");
+            opt.setOrder(1);
+            if (identity != null) {
+              Profile p = identity.getProfile();
+              opt.setValue((String) p.getProperty(Profile.USERNAME));
+              opt.setText(p.getFullName());
+              opt.setAvatarUrl(p.getAvatarUrl());
+            } else {
+              opt.setValue(item);
+              opt.setText(item);
+            }
+          }
+          nameList.addOption(opt);
+        }
+
+        return Util.getResponse(nameList, uriInfo, mediaType, Response.Status.OK);
+      }
+
       // Search in connections first
       ListAccess<Identity> connections = getRelationshipManager().getConnectionsByFilter(currentIdentity, identityFilter);
       if (connections != null && connections.getSize() > 0) {
