@@ -1,7 +1,8 @@
 (function($, selectize) {
     var invite = {
-        build: function(selector, url) {
+        build: function(selector, url, placeholder) {
             $('#' + selector).selectize({
+                placeholder: placeholder,
                 plugins: ['remove_button', 'restore_on_backspace'],
                 preload: true,
                 maxItems: null,
