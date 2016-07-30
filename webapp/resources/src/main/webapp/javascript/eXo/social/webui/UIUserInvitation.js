@@ -1,7 +1,8 @@
-(function($, selectize) {
+(function($) {
     var invite = {
         build: function(selector, url, placeholder) {
-            $('#' + selector).selectize({
+            $('#' + selector).suggester({
+                type : 'tag',
                 placeholder: placeholder,
                 plugins: ['remove_button', 'restore_on_backspace'],
                 preload: true,
@@ -9,10 +10,10 @@
                 valueField: 'value',
                 labelField: 'text',
                 searchField: ['text'],
-                load: function(query, callback) {
+                source: function(query, callback) {
                     if (query == '') {
                         var thizz = this;
-                        if (this.items.length > 0) {
+                        if (!this.items.length) {
                             $.ajax({
                                 type: "GET",
                                 url: url,
@@ -47,28 +48,26 @@
                     }
                 },
                 create: true,
-                render: {
-                    option: function(item, escape) {
-                        var avatar = item.avatarUrl;
-                        if (avatar == null) {
-                            if (item.type == "space") {
-                                avatar = '/eXoSkin/skin/images/system/SpaceAvtDefault.png';
-                            } else {
-                                avatar = '/eXoSkin/skin/images/system/UserAvtDefault.png';
-                            }
-                        }
+                renderMenuItem: function(item, escape) {
+                  var avatar = item.avatarUrl;
+                  if (avatar == null) {
+                      if (item.type == "space") {
+                          avatar = '/eXoSkin/skin/images/system/SpaceAvtDefault.png';
+                      } else {
+                          avatar = '/eXoSkin/skin/images/system/UserAvtDefault.png';
+                      }
+                  }
 
-                        var text = item.text;
-                        if (item.type == 'user') {
-                            text += ' (' + item.value + ')';
-                        }
+                  var text = item.text;
+                  if (item.type == 'user') {
+                      text += ' (' + item.value + ')';
+                  }
 
-                        return '<div class="option">' +
-                        '<img width="20px" height="20px" src="' + avatar + '"> ' +
-                        escape(text) + '</div>';
-                    }
-                },
-                sortField: [{field: 'order'}, {field: '$score'}]
+                  return '<div class="option">' +
+                  '<img width="20px" height="20px" src="' + avatar + '"> ' +
+                  escape(text) + '</div>';
+              },
+              sortField: [{field: 'order'}, {field: '$score'}]
             });
         },
 
@@ -78,4 +77,4 @@
     };
 
     return invite;
-})($, selectize);
+})($);
