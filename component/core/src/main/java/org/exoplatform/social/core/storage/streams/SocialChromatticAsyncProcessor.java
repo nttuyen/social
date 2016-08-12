@@ -29,12 +29,8 @@ import org.exoplatform.social.common.service.AsyncCallback;
 import org.exoplatform.social.common.service.AsyncProcessor;
 import org.exoplatform.social.common.service.ProcessContext;
 import org.exoplatform.social.common.service.SocialServiceContext;
-import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.storage.cache.SocialStorageCacheService;
 import org.exoplatform.social.core.storage.cache.model.data.ListActivitiesData;
-import org.exoplatform.social.core.storage.cache.model.key.ActivityCountKey;
-import org.exoplatform.social.core.storage.cache.model.key.ActivityType;
-import org.exoplatform.social.core.storage.cache.model.key.IdentityKey;
 import org.exoplatform.social.core.storage.cache.model.key.ListActivitiesKey;
 
 public abstract class SocialChromatticAsyncProcessor implements AsyncProcessor {
