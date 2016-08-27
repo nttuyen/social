@@ -6,7 +6,9 @@
  	import org.exoplatform.social.core.identity.model.Profile;
  	import org.exoplatform.portal.application.PortalRequestContext;
  	import org.exoplatform.social.webui.profile.UIProfileUserSearch;
+ 	import org.exoplatform.commons.utils.HTMLEntityEncoder;
 
+    def encoder = HTMLEntityEncoder.getInstance();
   def isEditable = uicomponent.isEditable();
 	def myRelation = uicomponent.getMyRelation();
 	def currIdentity = uicomponent.getCurrentIdentity();
@@ -71,7 +73,7 @@
 		  	  id = relation.sender;
 			  }
 			  profileURL = Utils.getURI("activities") + "/" + id.getRemoteId();
-		    fullName = id.profile.fullName;
+		    fullName = encoder.encode(id.profile.fullName);
 		    position = id.profile.getPropertyValue("position");
 		    def actionLink = uicomponent.event("Remove",id.getId());
 		    position = id.profile.getPropertyValue("position");

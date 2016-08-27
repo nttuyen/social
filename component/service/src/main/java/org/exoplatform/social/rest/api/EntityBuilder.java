@@ -61,6 +61,7 @@ import org.exoplatform.social.rest.entity.SpaceEntity;
 import org.exoplatform.social.rest.entity.SpaceMembershipEntity;
 import org.exoplatform.social.rest.entity.UserEntity;
 import org.exoplatform.social.service.rest.api.VersionResources;
+import org.exoplatform.webui.core.lifecycle.WebuiBindingContext;
 
 public class EntityBuilder {
   public static final String USERS_TYPE              = "users";
@@ -317,6 +318,7 @@ public class EntityBuilder {
     commentEntity.setMentions(getActivityMentions(comment, restPath));
     commentEntity.setCreateDate(RestUtils.formatISO8601(new Date(comment.getPostedTime())));
     commentEntity.setUpdateDate(RestUtils.formatISO8601(comment.getUpdated()));
+    
     commentEntity.setActivity(RestUtils.getRestUrl(ACTIVITIES_TYPE, comment.getParentId(), restPath));
     //
     if(!isBuildList) {
@@ -386,6 +388,48 @@ public class EntityBuilder {
       infos.add(EntityBuilder.buildEntityRelationship(relationship, uriInfo.getPath(), RestUtils.getQueryParam(uriInfo, "expand"), true).getDataEntity());
     }
     return infos;
+  }
+  
+  public static String buildTimeString(long postedTime) throws Exception {
+    long time = (new Date().getTime() - postedTime) / 1000;
+    long value;
+    if (time < 60) {
+      return "UIActivity.label.Less_Than_A_Minute";
+    } else {
+      if (time < 120) {
+        return "UIActivity.label.About_A_Minute";
+      } else {
+        if (time < 3600) {
+          value = Math.round(time / 60);
+          return "UIActivity.label.About_?_Minutes#" + String.valueOf(value);
+        } else {
+          if (time < 7200) {
+            return "UIActivity.label.About_An_Hour";
+          } else {
+            if (time < 86400) {
+              value = Math.round(time / 3600);
+              return "UIActivity.label.About_?_Hours#" + String.valueOf(value);
+            } else {
+              if (time < 172800) {
+                return "UIActivity.label.About_A_Day";
+              } else {
+                if (time < 2592000) {
+                  value = Math.round(time / 86400);
+                  return "UIActivity.label.About_?_Days#" + String.valueOf(value);
+                } else {
+                  if (time < 5184000) {
+                    return "UIActivity.label.About_A_Month";
+                  } else {
+                    value = Math.round(time / 2592000);
+                    return "UIActivity.label.About_?_Months" + String.valueOf(value);
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   }
 
   private static DataEntity getActivityOwner(Identity owner, String restPath) {

@@ -29,8 +29,10 @@
   import org.exoplatform.social.webui.Utils;
   import org.exoplatform.social.core.service.LinkProvider;
   import org.apache.commons.lang.StringEscapeUtils;
+  import org.exoplatform.commons.utils.HTMLEntityEncoder;
 
   def pcontext = Util.getPortalRequestContext();
+  def encoder = HTMLEntityEncoder.getInstance();
   def labelActivityHasBeenDeleted = _ctx.appRes("UIActivity.label.Activity_Has_Been_Deleted");
   def activity = uicomponent.getActivity();
   def activityDeletable = uicomponent.isActivityDeletable();
@@ -137,9 +139,12 @@
     }
   }
 
-  if (!labelLikes) {
+
+  if (!labelLikes) {  
    //hides diplayPeopleBG
    listPeopleBGClass = "displayNone";
+  } else {
+    labelLikes = encoder.encode(labelLikes);
   }
 
   activityPostedTime = uicomponent.getPostedTimeString(_ctx, activity.postedTime);
@@ -166,6 +171,7 @@
     ownerAvatar = profile.avatarUrl;
     ownerName = profile.fullName;
   }
+  ownerName = encoder.encode(ownerName);
   def currentTime = System.currentTimeMillis();
   
   String viewActivityTip = _ctx.appRes("UIActivity.msg.ViewActivity");
@@ -237,7 +243,7 @@
 					<%
 					displayedIdentityLikes.each({
 					  def id = Utils.getIdentityManager().getIdentity(it);
-					  personLikeFullName = id.profile.fullName;
+					  personLikeFullName = encoder.encode(id.profile.fullName);
 					  personLikeProfileUri = LinkProvider.getUserProfileUri(id.getRemoteId());
 					  personLikeAvatarImageSource = id.profile.avatarUrl;
 					  if (!personLikeAvatarImageSource) { personLikeAvatarImageSource = LinkProvider.PROFILE_DEFAULT_AVATAR_URL; }
@@ -286,7 +292,7 @@
 			  }
 
 			  def id = Utils.getIdentityManager().getIdentity(it.userId);
-			  commenterFullName = id.profile.fullName;
+			  commenterFullName = encoder.encode(id.profile.fullName);
 			  commenterProfileUri = LinkProvider.getUserProfileUri(id.getRemoteId());
 			  commentMessage = it.title;
 			  commentPostedTime = uicomponent.getPostedTimeString(_ctx, it.postedTime);
@@ -333,7 +339,7 @@
 			  def currentCommenterIdentity = Utils.getOwnerIdentity();
 			  def currentCommenterUri = LinkProvider.getUserProfileUri(currentCommenterIdentity.getRemoteId());
 			  def currentCommenterAvatar = currentCommenterIdentity.profile.avatarUrl;
-			  def currentCommenterName = currentCommenterIdentity.profile.fullName;
+			  def currentCommenterName = encoder.encode(currentCommenterIdentity.profile.fullName);
 			  if (!currentCommenterAvatar) currentCommenterAvatar= LinkProvider.PROFILE_DEFAULT_AVATAR_URL;
 			%>
 			<% if (commentList.size() == 0) { %>

@@ -32,8 +32,10 @@
   import org.exoplatform.social.webui.profile.UIProfileUserSearch;
   import org.exoplatform.social.core.identity.model.Profile;
   import org.exoplatform.social.core.service.LinkProvider;
+  import org.exoplatform.commons.utils.HTMLEntityEncoder;
 
   def uicomponentId = uicomponent.id;
+  def encoder = HTMLEntityEncoder.getInstance();
   PortalContainer portalContainer = PortalContainer.getInstance();
   String portalName = portalContainer.getPortalContainerInfo().getContainerName();
 
@@ -132,7 +134,7 @@
     <div class="itemList userList clearfix">
       <% for (identity in myInvitations) {
             profileURL = LinkProvider.getUserProfileUri(identity.getRemoteId());
-            fullName = identity.profile.fullName;
+            fullName = encoder.encode(identity.profile.fullName);
             position = identity.profile.position;
             def email= identity.profile.email;
             if (!email) email = "";

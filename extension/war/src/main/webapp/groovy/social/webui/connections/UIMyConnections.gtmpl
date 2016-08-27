@@ -29,8 +29,10 @@
   import org.exoplatform.portal.application.PortalRequestContext;
   import org.exoplatform.social.webui.profile.UIProfileUserSearch;
   import org.exoplatform.social.core.service.LinkProvider;
+  import org.exoplatform.commons.utils.HTMLEntityEncoder;
 
   def uicomponentId = uicomponent.id;
+  def encoder = HTMLEntityEncoder.getInstance();
   def isEditable = uicomponent.isEditable();
   def currIdentity = Utils.getOwnerIdentity(true);
   def profileURL, activitiesURL, fullName, possition, actionAccept, actionDeny, position;
@@ -123,7 +125,7 @@
      <div class="itemList userList clearfix">
         <%  for(id in myRelation) {
             profileURL = LinkProvider.getUserProfileUri(id.getRemoteId());
-            fullName = id.profile.fullName;
+            fullName = encoder.encode(id.profile.fullName);
             def removeConnectionAction = uicomponent.event("RemoveConnection",id.getId());
             position = id.profile.position;
             relationIdx += 1;
