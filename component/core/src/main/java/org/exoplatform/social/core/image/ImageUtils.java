@@ -17,18 +17,17 @@
  */
 package org.exoplatform.social.core.image;
 
-import java.awt.RenderingHints;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-
-import javax.imageio.ImageIO;
-
 import org.exoplatform.commons.utils.MimeTypeResolver;
 import org.exoplatform.services.log.ExoLogger;
 import org.exoplatform.services.log.Log;
 import org.exoplatform.social.core.model.AvatarAttachment;
+
+import javax.imageio.ImageIO;
+import java.awt.*;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
 
 /**
  * @author tuan_nguyenxuan Oct 29, 2010
@@ -119,14 +118,21 @@ public class ImageUtils {
       else if (width <= minSize)
         width = image.getWidth() * height / image.getHeight();
 
+      double thumbRatio = (double) width / (double) height;
+      int imageWidth = image.getWidth();
+      int imageHeight = image.getHeight();
+      double aspectRatio = (double) imageWidth / (double) imageHeight;
+
+      if (thumbRatio < aspectRatio) {
+        height = (int) (width / aspectRatio);
+      } else {
+        width = (int) (height * aspectRatio);
+      }
+
       // Create temp file to store resized image to put to avatar attachment
       File tmp = File.createTempFile("RESIZED", null);
-      image = org.apache.shindig.gadgets.rewrite.image.ImageUtils.getScaledInstance(image,
-                                                 width,
-                                                 height,
-                                                 RenderingHints.VALUE_INTERPOLATION_NEAREST_NEIGHBOR,
-                                                 false,
-                                                 BufferedImage.TYPE_INT_RGB);
+      image = resizeImage(image, width, height);
+
       ImageIO.write(image, extension, tmp);
       
       // Create new avatar attachment
@@ -144,5 +150,18 @@ public class ImageUtils {
       LOG.error("Fail to resize image to avatar attachment: " + e);
       return null;
     }
+  }
+
+  private static BufferedImage resizeImage(BufferedImage image, int width, int height) {
+    final BufferedImage bufferedImage = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+    final Graphics2D graphics2D = bufferedImage.createGraphics();
+    graphics2D.setComposite(AlphaComposite.Src);
+    //below three lines are for RenderingHints for better image quality
+    graphics2D.setRenderingHint(RenderingHints.KEY_INTERPOLATION,RenderingHints.VALUE_INTERPOLATION_BILINEAR);
+    graphics2D.setRenderingHint(RenderingHints.KEY_RENDERING,RenderingHints.VALUE_RENDER_QUALITY);
+    graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+    graphics2D.drawImage(image, 0, 0, width, height, null);
+    graphics2D.dispose();
+    return bufferedImage;
   }
 }
