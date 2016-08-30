@@ -83,8 +83,8 @@ public class ImageUtils {
 
   /**
    * @param imageStream
-   * @param width
-   * @param height
+   * @param maxWidth
+   * @param maxHeight
    * @param avatarId
    * @param avatarFileName
    * @param avatarMimeType
@@ -93,45 +93,44 @@ public class ImageUtils {
    *         avatar
    */
   public static AvatarAttachment createResizedAvatarAttachment(InputStream imageStream,
-                                                               int width,
-                                                               int height,
+                                                               int maxWidth,
+                                                               int maxHeight,
                                                                String avatarId,
                                                                String avatarFileName,
                                                                String avatarMimeType,
                                                                String avatarWorkspace) {
+    if (maxHeight <= 0 || maxWidth <= 0) {
+      LOG.warn("Fail to resize image to avatar attachment with dimension <= 0");
+      return null;
+    }
+
     try {
       MimeTypeResolver mimeTypeResolver = new MimeTypeResolver();
-      int minSize = 0;
       String extension = mimeTypeResolver.getExtension(avatarMimeType);
       // TODO: Resize gif image. Now we skip gif because we can't resize it now
-      if (extension.equalsIgnoreCase(GIF_EXTENDSION))
+      if (extension.equalsIgnoreCase(GIF_EXTENDSION)) {
         return null;
+      }
+
       image = ImageIO.read(imageStream);
-      if (height <= minSize & width <= minSize) {
-        LOG.warn("Fail to resize image to avatar attachment with dimention <= 0x0");
-        return null;
-      }
-      
-      if (height <= minSize) {
-          height = image.getHeight() * width / image.getWidth();
-      }
-      else if (width <= minSize)
-        width = image.getWidth() * height / image.getHeight();
 
-      double thumbRatio = (double) width / (double) height;
-      int imageWidth = image.getWidth();
-      int imageHeight = image.getHeight();
-      double aspectRatio = (double) imageWidth / (double) imageHeight;
+      int targetHeight = image.getHeight();
+      int targetWidth = image.getWidth();
 
-      if (thumbRatio < aspectRatio) {
-        height = (int) (width / aspectRatio);
-      } else {
-        width = (int) (height * aspectRatio);
+      double maxDimensionsRatio =  (double) maxHeight / (double) maxWidth;
+      double imageRatio =  (double) image.getHeight() / (double) image.getWidth();
+
+      if(imageRatio > maxDimensionsRatio && image.getHeight() > maxHeight) {
+        targetHeight = maxHeight;
+        targetWidth = (maxHeight * image.getWidth()) / image.getHeight();
+      } else if(imageRatio < maxDimensionsRatio && image.getWidth() > maxWidth) {
+        targetHeight = (maxWidth * image.getHeight()) / image.getWidth();
+        targetWidth = maxWidth;
       }
 
       // Create temp file to store resized image to put to avatar attachment
       File tmp = File.createTempFile("RESIZED", null);
-      image = resizeImage(image, width, height);
+      image = resizeImage(image, targetWidth, targetHeight);
 
       ImageIO.write(image, extension, tmp);
       
