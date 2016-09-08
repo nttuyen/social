@@ -418,6 +418,7 @@ public class ActivityStreamStorageImpl extends AbstractStorage implements Activi
   
   @Override
   public void delete(String activityId) {
+    int counter = 0;
     this.activityWriteLock.lock();
     try {
       //
@@ -434,13 +435,20 @@ public class ActivityStreamStorageImpl extends AbstractStorage implements Activi
         refList.add(ref.getDay().getMonth().getYear().getList());
       }
       
-      for(ActivityRefListEntity list : refList) {
-        list.remove(activityEntity, hidableActivity.getHidden(), null);
+      for (ActivityRefListEntity list : refList) {
+        counter++;
+        try {
+          list.remove(activityEntity, hidableActivity.getHidden(), null);
+        } catch (Exception e) {
+          LOG.error("An exception when removing a reference", e);
+        }
+        if (counter == BATCH) {
+          StorageUtils.persist();
+          counter = 0;
+        }
       }
-      
-      
-    } catch (NodeNotFoundException e) {
-      LOG.warn("Failed to delete Activities references.", e);
+    } catch (Exception e) {
+      LOG.error("Failed to delete Activities references.", e);
     } finally {
       this.activityWriteLock.unlock();
     }

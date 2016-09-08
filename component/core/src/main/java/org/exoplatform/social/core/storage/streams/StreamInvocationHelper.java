@@ -156,6 +156,23 @@ public class StreamInvocationHelper {
     
     return processCtx;
   }
+
+  public static  ProcessContext deleteActivity(String activityId) {
+    SocialServiceContext ctx = SocialServiceContextImpl.getInstance();
+    StreamProcessContext processCtx = StreamProcessContext.getIntance(StreamProcessContext.DELETE_ACTIVITY_PROCESS, ctx);
+    processCtx.activityId(activityId);
+    try {
+      if(ctx.isAsync()) {
+        beforeAsync();
+        ctx.getServiceExecutor().async(StreamProcessorFactory.deleteActivity(), processCtx);
+      } else {
+        ctx.getServiceExecutor().execute(StreamProcessorFactory.deleteActivity(), processCtx);
+      }
+    } finally {
+      LOG.debug(processCtx.getTraceLog());
+    }
+    return processCtx;
+  }
   
   //(parentActivity, mentioners, commenters);
   public static ProcessContext deleteComment(ExoSocialActivity activity, String[] mentioners, String[] commenters) {
