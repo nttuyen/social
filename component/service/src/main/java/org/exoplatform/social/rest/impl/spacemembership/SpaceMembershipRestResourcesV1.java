@@ -21,24 +21,6 @@ import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
 import io.swagger.annotations.ApiResponse;
 import io.swagger.annotations.ApiResponses;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import javax.annotation.security.RolesAllowed;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
-
 import org.apache.commons.lang.ArrayUtils;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.commons.utils.ListAccess;
@@ -56,6 +38,22 @@ import org.exoplatform.social.rest.entity.DataEntity;
 import org.exoplatform.social.rest.entity.SpaceMembershipEntity;
 import org.exoplatform.social.service.rest.api.VersionResources;
 
+import javax.annotation.security.RolesAllowed;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.UriInfo;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 @Path(VersionResources.VERSION_ONE + "/social/spacesMemberships")
 @Api(tags = VersionResources.VERSION_ONE + "/social/spacesMemberships", value = VersionResources.VERSION_ONE + "/social/spacesMemberships", description = "Managing memberships of users in a space")
 public class SpaceMembershipRestResourcesV1 implements SpaceMembershipRestResources {
@@ -63,7 +61,7 @@ public class SpaceMembershipRestResourcesV1 implements SpaceMembershipRestResour
   private static final String SPACE_PREFIX = "/spaces/";
   
   private enum MembershipType {
-    ALL, PENDING, APPROVED
+    ALL, PENDING, APPROVED, IGNORED
   }
   
   public SpaceMembershipRestResourcesV1(){
@@ -118,6 +116,12 @@ public class SpaceMembershipRestResourcesV1 implements SpaceMembershipRestResour
         user, new SpaceFilter(spaceDisplayName)) : spaceService.getAccessibleSpacesWithListAccess(user);
       break;
     }
+
+    case IGNORED: {
+      listAccess = spaceDisplayName != null ? spaceService.getIgnoredSpacesByFilter(
+        user, new SpaceFilter(spaceDisplayName)) : spaceService.getIgnoredSpacesWithListAccess(user);
+    break;
+   }
     
     default:
       if (spaceDisplayName != null) {
@@ -163,6 +167,7 @@ public class SpaceMembershipRestResourcesV1 implements SpaceMembershipRestResour
     if (model == null || model.getUser() == null || model.getSpace() == null) {
       throw new WebApplicationException(Response.Status.UNAUTHORIZED);
     }
+    Response response;
     String user = model.getUser();
     String space = model.getSpace();
     String authenticatedUser = ConversationState.getCurrent().getIdentity().getUserId();
@@ -172,12 +177,11 @@ public class SpaceMembershipRestResourcesV1 implements SpaceMembershipRestResour
       throw new WebApplicationException(Response.Status.UNAUTHORIZED);
     }
     Space givenSpace = spaceService.getSpaceByDisplayName(space);
-    
+    if (!(MembershipType.IGNORED.name().equals(model.getStatus()))) {
     IdentityManager identityManager = CommonsUtils.getService(IdentityManager.class);
     if (user == null || identityManager.getOrCreateIdentity(OrganizationIdentityProvider.NAME, user, true) == null) {
       throw new WebApplicationException(Response.Status.UNAUTHORIZED);
     }
-    
     if (RestUtils.isMemberOfAdminGroup() || spaceService.isManager(givenSpace, authenticatedUser)
         || (authenticatedUser.equals(user) && givenSpace.getRegistration().equals(Space.OPEN))) {
       spaceService.addMember(givenSpace, user);
@@ -188,7 +192,13 @@ public class SpaceMembershipRestResourcesV1 implements SpaceMembershipRestResour
       throw new WebApplicationException(Response.Status.UNAUTHORIZED);
     }
     SpaceMembershipEntity membershipEntity = EntityBuilder.buildEntityFromSpaceMembership(givenSpace, user, "", uriInfo.getPath(), expand);
-    return EntityBuilder.getResponse(membershipEntity, uriInfo, RestUtils.getJsonMediaType(), Response.Status.OK);
+    response = EntityBuilder.getResponse(membershipEntity, uriInfo, RestUtils.getJsonMediaType(), Response.Status.OK);
+  } else {
+    SpaceMembershipEntity membershipEntity = EntityBuilder.createSpaceMembershipForIgnoredStatus(givenSpace, user, MembershipType.IGNORED.name(), "", uriInfo.getPath(), expand);
+    spaceService.setIgnored(givenSpace, user, true);
+    response = EntityBuilder.getResponse(membershipEntity, uriInfo, RestUtils.getJsonMediaType(), Response.Status.OK);
+    }
+    return response;
   }
   
   @GET

@@ -17,20 +17,6 @@
 
 package org.exoplatform.social.rest.api;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.concurrent.ConcurrentHashMap;
-
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.UriInfo;
-import javax.ws.rs.core.Response.ResponseBuilder;
-
 import org.apache.commons.lang.ArrayUtils;
 import org.exoplatform.commons.utils.CommonsUtils;
 import org.exoplatform.services.rest.ApplicationContext;
@@ -48,19 +34,21 @@ import org.exoplatform.social.core.relationship.model.Relationship;
 import org.exoplatform.social.core.service.LinkProvider;
 import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.space.spi.SpaceService;
-import org.exoplatform.social.rest.entity.ActivityEntity;
-import org.exoplatform.social.rest.entity.BaseEntity;
-import org.exoplatform.social.rest.entity.CollectionEntity;
-import org.exoplatform.social.rest.entity.CommentEntity;
-import org.exoplatform.social.rest.entity.DataEntity;
-import org.exoplatform.social.rest.entity.IdentityEntity;
-import org.exoplatform.social.rest.entity.LinkEntity;
-import org.exoplatform.social.rest.entity.ProfileEntity;
-import org.exoplatform.social.rest.entity.RelationshipEntity;
-import org.exoplatform.social.rest.entity.SpaceEntity;
-import org.exoplatform.social.rest.entity.SpaceMembershipEntity;
-import org.exoplatform.social.rest.entity.UserEntity;
+import org.exoplatform.social.rest.entity.*;
 import org.exoplatform.social.service.rest.api.VersionResources;
+
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
+import javax.ws.rs.core.UriInfo;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class EntityBuilder {
   public static final String USERS_TYPE              = "users";
@@ -258,6 +246,29 @@ public class EntityBuilder {
     spaceMembership.setDataSpace(spaceEntity);
     spaceMembership.setRole(type);
     spaceMembership.setStatus("approved");
+
+    return spaceMembership;
+  }
+
+  public static SpaceMembershipEntity createSpaceMembershipForIgnoredStatus(Space space, String userId, String status, String type, String restPath, String expand) {
+    String id = space.getPrettyName() + ":" + userId + ":" + type;
+    SpaceMembershipEntity spaceMembership = new SpaceMembershipEntity(id);
+    spaceMembership.setHref(RestUtils.getRestUrl(SPACES_MEMBERSHIP_TYPE, id, restPath));
+    LinkEntity userEntity, spaceEntity;
+    if (USERS_TYPE.equals(expand)) {
+      userEntity = new LinkEntity(buildEntityProfile(userId, restPath, ""));
+    } else {
+      userEntity = new LinkEntity(RestUtils.getRestUrl(USERS_TYPE, userId, restPath));
+    }
+    spaceMembership.setDataUser(userEntity);
+    if (SPACES_TYPE.equals(expand)) {
+      spaceEntity = new LinkEntity(buildEntityProfile(userId, restPath, ""));
+    } else {
+      spaceEntity = new LinkEntity(RestUtils.getRestUrl(SPACES_TYPE, space.getId(), restPath));
+    }
+    spaceMembership.setDataSpace(spaceEntity);
+    spaceMembership.setRole(type);
+    spaceMembership.setStatus("ignored");
 
     return spaceMembership;
   }

@@ -50,6 +50,14 @@ public interface SpaceStorage {
   public void saveSpace(Space space, boolean isNew) throws SpaceStorageException;
 
   /**
+   * Update List of ignoredUsers for a Space
+   *
+   * @param space
+   * @param userId
+   */
+  void UpdateSpaceIgnoredList(Space space, String[] userId);
+
+  /**
    * Renames a space.
    * 
    * @param space
@@ -207,6 +215,24 @@ public interface SpaceStorage {
   public int getInvitedSpacesByFilterCount(String userId, SpaceFilter spaceFilter);
 
   /**
+   * Gets the count of the invited spaces of the userId.
+   *
+   * @param userId
+   * @return the count of the ignored spaces
+   * @throws SpaceStorageException
+   */
+  public int getIgnoredSpacesCount(String userId) throws SpaceStorageException;
+
+  /**
+   * Gets the count of the invited spaces of the user by filter.
+   *
+   * @param userId
+   * @param spaceFilter
+   * @return
+   */
+   public int getIgnoredSpacesByFilterCount(String userId, SpaceFilter spaceFilter);
+
+  /**
    * Gets a user's invited spaces and that user can accept or deny the request.
    *
    * @param userId
@@ -227,6 +253,38 @@ public interface SpaceStorage {
    * @since 1.2.0-GA
    */
   public List<Space> getInvitedSpaces(String userId, long offset, long limit) throws SpaceStorageException;
+
+  /**
+   * Gets a user's invited spaces and that user can accept or deny the request.
+   *
+   * @param userId
+   * @return a list of the invited spaces.
+   * @throws SpaceStorageException
+   * @since 1.2.0-GA
+   */
+  public List<Space> getIgnoredSpaces(String userId) throws SpaceStorageException;
+
+  /**
+   *
+   * @param userId
+   * @param offset
+   * @param limit
+   * @return a list of the ignored spaces with offset, limit
+   * @throws SpaceStorageException
+   */
+   List<Space> getIgnoredSpaces(String userId, long offset, long limit) throws SpaceStorageException;
+
+  /**
+   * Gets the invited spaces of the user by space filter with offset, limit.
+   *
+   * @param userId
+   * @param spaceFilter
+   * @param offset
+   * @param limit
+   * @return
+   * @since 1.2.0-GA
+   */
+   List<Space> getIgnoredSpacesByFilter(String userId, SpaceFilter spaceFilter, long offset, long limit);
 
   /**
    * Gets the invited spaces of the user by space filter with offset, limit.

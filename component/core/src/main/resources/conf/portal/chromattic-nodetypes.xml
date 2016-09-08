@@ -118,6 +118,11 @@
           <requiredPrimaryType>soc:spaceslist</requiredPrimaryType>
         </requiredPrimaryTypes>
       </childNodeDefinition>
+      <childNodeDefinition name="soc:spaceignoredmember" defaultPrimaryType="soc:spaceslist" autoCreated="true" mandatory="true" onParentVersion="COPY" protected="false" sameNameSiblings="false">
+        <requiredPrimaryTypes>
+          <requiredPrimaryType>soc:spaceslist</requiredPrimaryType>
+        </requiredPrimaryTypes>
+      </childNodeDefinition>
       <childNodeDefinition name="soc:spacemanagermember" defaultPrimaryType="soc:spaceslist" autoCreated="true" mandatory="true" onParentVersion="COPY" protected="false" sameNameSiblings="false">
         <requiredPrimaryTypes>
           <requiredPrimaryType>soc:spaceslist</requiredPrimaryType>
@@ -603,6 +608,9 @@
         <valueConstraints/>
       </propertyDefinition>
       <propertyDefinition name="soc:invitedMembersId" requiredType="String" autoCreated="false" mandatory="false" onParentVersion="COPY" protected="false" multiple="true">
+        <valueConstraints/>
+      </propertyDefinition>
+      <propertyDefinition name="soc:ignoredMembersId" requiredType="String" autoCreated="false" mandatory="false" onParentVersion="COPY" protected="false" multiple="true">
         <valueConstraints/>
       </propertyDefinition>
       <propertyDefinition name="soc:visibility" requiredType="String" autoCreated="false" mandatory="false" onParentVersion="COPY" protected="false" multiple="false">

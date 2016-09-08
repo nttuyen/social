@@ -35,6 +35,13 @@ public enum SpaceAccessType {
       return acl.getSuperUser().equals(remoteId) && (space != null);
     }
   },
+  IGNORED_SPACE("social.space.access.ignored-space") {
+
+    @Override
+    public boolean doCheck(String remoteId, Space space) {
+      return getSpaceService().isIgnored(space, remoteId);
+    }
+  },
   INVITED_SPACE("social.space.access.invited-space") {
 
     @Override

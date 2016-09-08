@@ -53,6 +53,9 @@ public class Space {
   /** The invited users. */
   private String[] invitedUsers;
 
+  /** The invited users. */
+  private String[] ignoredUsers;
+
   /** The type. */
   private String type;
 
@@ -550,6 +553,14 @@ public class Space {
   @Deprecated
   public void setCreator(String creator) {
     this.creator = creator;
+  }
+
+  public String[] getIgnoredUsers() {
+    return ignoredUsers;
+  }
+
+  public void setIgnoredUsers(String[] ignoredUsers) {
+    this.ignoredUsers = ignoredUsers;
   }
   
   /**

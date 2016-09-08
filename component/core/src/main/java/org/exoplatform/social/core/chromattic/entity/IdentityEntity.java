@@ -17,19 +17,10 @@
 
 package org.exoplatform.social.core.chromattic.entity;
 
-import java.util.Map;
-
-import org.chromattic.api.annotations.Create;
-import org.chromattic.api.annotations.Id;
-import org.chromattic.api.annotations.MappedBy;
-import org.chromattic.api.annotations.Name;
-import org.chromattic.api.annotations.OneToOne;
-import org.chromattic.api.annotations.Owner;
-import org.chromattic.api.annotations.Path;
-import org.chromattic.api.annotations.PrimaryType;
-import org.chromattic.api.annotations.Properties;
-import org.chromattic.api.annotations.Property;
+import org.chromattic.api.annotations.*;
 import org.exoplatform.social.core.storage.query.PropertyLiteralExpression;
+
+import java.util.Map;
 
 /**
  * @author <a href="mailto:alain.defrance@exoplatform.com">Alain Defrance</a>
@@ -82,7 +73,7 @@ public abstract class IdentityEntity {
   @Owner
   public abstract ProfileEntity getProfile();
   public abstract void setProfile(ProfileEntity profile);
-  
+
   /**
    * Store activities's streams
    */
@@ -100,7 +91,7 @@ public abstract class IdentityEntity {
   @Owner
   public abstract ActivityListEntity getActivityList();
   public abstract void setActivityList(ActivityListEntity activityListEntity);
-  
+
   /**
    * Store all the relationships which contain an identity inviting other identities to connect with himself.
    */
@@ -162,6 +153,15 @@ public abstract class IdentityEntity {
   @MappedBy("soc:spacependingmember")
   public abstract SpaceListEntity getPendingSpaces();
   public abstract void setPendingSpaces(SpaceListEntity spaces);
+
+  /**
+   * Store all spaces which an identity had ignored.
+   */
+  @OneToOne
+  @Owner
+  @MappedBy("soc:spaceignoredmember")
+  public abstract SpaceListEntity getIgnoredSpaces();
+  public abstract void setIgnoredSpaces(SpaceListEntity spaces);
 
   /**
    * Store all spaces which an identity is invited to join.

@@ -246,6 +246,25 @@ public interface SpaceService {
    */
   ListAccess<Space> getPendingSpacesByFilter(String userId, SpaceFilter spaceFilter);
 
+   /**
+   * Gets a list access containing all spaces that a user had ignored.
+   *
+   * @param userId The remote user Id.
+   * @return The list access.
+   * @LevelAPI Platform
+   */
+  ListAccess<Space> getIgnoredSpacesWithListAccess(String userId);
+
+  /**
+   * Gets a list access containing all spaces that a user had ignored.
+   * This list access matches with the provided space filter.
+   *
+   * @param userId The remote user Id.
+   * @param spaceFilter The provided space filter.
+   * @return The list access.
+   * @LevelAPI Platform
+   */
+  ListAccess<Space> getIgnoredSpacesByFilter(String userId, SpaceFilter spaceFilter);
   /**
    * Creates a new space: creating a group, its group navigation with pages for installing space applications.
    *
@@ -349,6 +368,17 @@ public interface SpaceService {
   boolean isInvitedUser(Space space, String userId);
 
   /**
+   * Checks if a user is in the list of users who have ignored the space.
+   *
+   * @param space The existing space.
+   * @param userId The remote user Id.
+   * @return TRUE if the user is in the list of invited users. Otherwise, it is FALSE.
+   * @LevelAPI Platform
+   *
+   */
+  boolean isIgnored(Space space, String userId);
+
+  /**
    * Adds a user to a space. The user will get the "member" role in a space.
    *
    * @param space The existing space.
@@ -386,6 +416,16 @@ public interface SpaceService {
    * @since 1.2.0-GA
    */
   void setManager(Space space, String userId, boolean isManager);
+
+  /**
+   * Assigns the user who has ignored the space.
+   *
+   * @param space The space ignored by the user.
+   * @param userId The remote user Id.
+   * @param isIgnored "True" if the user has ignored the space. "False" if not.
+   * @LevelAPI Platform
+   */
+  void setIgnored(Space space, String userId, boolean isIgnored);
 
   /**
    * Checks if a given user has the "manager" role in a space.

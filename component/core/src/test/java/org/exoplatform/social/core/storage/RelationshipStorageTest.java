@@ -597,7 +597,7 @@ public class RelationshipStorageTest extends AbstractCoreTest {
    * in case Identity had no connection yet
    * @throws Exception
    */
-  @MaxQueryNumber(1101)
+  @MaxQueryNumber(1125)
   public void testGetConnectionsByFilterEmpty() throws Exception {
     populateData();
     ProfileFilter pf = new ProfileFilter();
@@ -636,7 +636,7 @@ public class RelationshipStorageTest extends AbstractCoreTest {
    * @throws Exception
    * @since 1.2.3
    */
-  @MaxQueryNumber(1341)
+  @MaxQueryNumber(1365)
   public void testGetIncomingByFilter() throws Exception {
     populateData();
     populateRelationshipIncommingData();
@@ -657,7 +657,7 @@ public class RelationshipStorageTest extends AbstractCoreTest {
    * @throws Exception
    * @since 1.2.3
    */
-  @MaxQueryNumber(1341)
+  @MaxQueryNumber(1365)
   public void testGetOutgoingByFilter() throws Exception {
     populateData();
     populateRelationshipData(Type.PENDING);
@@ -678,7 +678,7 @@ public class RelationshipStorageTest extends AbstractCoreTest {
    * @throws Exception
    * @since 1.2.3
    */
-  @MaxQueryNumber(1341)
+  @MaxQueryNumber(1365)
   public void testGetIncomingCountByFilter() throws Exception {
     populateData();
     populateRelationshipIncommingData();
@@ -720,7 +720,7 @@ public class RelationshipStorageTest extends AbstractCoreTest {
    * @throws Exception
    * @since 1.2.3
    */
-  @MaxQueryNumber(1341)
+  @MaxQueryNumber(1365)
   public void testGetOutgoingCountByFilter() throws Exception {
     populateData();
     populateRelationshipData(Type.PENDING);

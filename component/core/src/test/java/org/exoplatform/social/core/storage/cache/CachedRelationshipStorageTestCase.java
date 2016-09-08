@@ -17,9 +17,6 @@
 
 package org.exoplatform.social.core.storage.cache;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.identity.provider.OrganizationIdentityProvider;
 import org.exoplatform.social.core.manager.IdentityManager;
@@ -29,6 +26,9 @@ import org.exoplatform.social.core.storage.impl.IdentityStorageImpl;
 import org.exoplatform.social.core.test.AbstractCoreTest;
 import org.exoplatform.social.core.test.MaxQueryNumber;
 import org.exoplatform.social.core.test.QueryNumberTest;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * @author <a href="mailto:alain.defrance@exoplatform.com">Alain Defrance</a>
@@ -69,7 +69,7 @@ public class CachedRelationshipStorageTestCase extends AbstractCoreTest {
     super.tearDown();
   }
 
-  @MaxQueryNumber(156)
+  @MaxQueryNumber(162)
   public void testSaveRelationship() throws Exception {
 
     Identity i1 = new Identity("p", "i1");
@@ -109,7 +109,7 @@ public class CachedRelationshipStorageTestCase extends AbstractCoreTest {
 
   }
 
-  @MaxQueryNumber(156)
+  @MaxQueryNumber(162)
   public void testGetRelationship() throws Exception {
 
     Identity i1 = new Identity("p", "i1");
@@ -132,7 +132,7 @@ public class CachedRelationshipStorageTestCase extends AbstractCoreTest {
     
   }
 
-  @MaxQueryNumber(165)
+  @MaxQueryNumber(171)
   public void testName() throws Exception {
 
     Identity i1 = new Identity("p", "i1");

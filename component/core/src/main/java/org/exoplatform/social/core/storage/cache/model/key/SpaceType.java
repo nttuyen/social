@@ -25,6 +25,7 @@ public enum SpaceType {
   MEMBER,
   PENDING,
   INVITED,
+  IGNORED,
   PUBLIC,
   ACCESSIBLE,
   VISIBLE,

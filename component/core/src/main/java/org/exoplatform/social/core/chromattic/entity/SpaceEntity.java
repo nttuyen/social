@@ -158,6 +158,15 @@ public abstract class SpaceEntity {
       new PropertyLiteralExpression<String>(String.class, "soc:invitedMembersId");
 
   /**
+   * The list of users who have ignored the space.
+   */
+  @Property(name = "soc:ignoredMembersId")
+  public abstract String[] getIgnoredMembersId();
+  public abstract void setIgnoredMembersId(String[] ignoredMembersId);
+  public static final PropertyLiteralExpression<String> ignoredMembersId =
+      new PropertyLiteralExpression<String>(String.class, "soc:ignoredMembersId");
+
+  /**
    * The list of users who are managers of a space.
    */
   @Property(name = "soc:managerMembersId")

@@ -16,13 +16,13 @@
  */
 package org.exoplatform.social.core.space;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.social.common.ListAccessValidator;
 import org.exoplatform.social.core.space.model.Space;
 import org.exoplatform.social.core.storage.api.SpaceStorage;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class SpaceListAccess implements ListAccess<Space> {
   /** The space activityStorage. */
@@ -57,6 +57,10 @@ public class SpaceListAccess implements ListAccess<Space> {
     PENDING,
     /** Gets the pending spaces of the user by filter. */
     PENDING_FILTER,
+    /** Gets the ignored spaces by user. */
+    IGNORED,
+    /** Gets the ignored spaces by user by filter. */
+    IGNORED_FILTER,
     /** Gets the public spaces of the user. */
     PUBLIC,
     /** Gets the public spaces of the user by filter. */
@@ -177,6 +181,8 @@ public class SpaceListAccess implements ListAccess<Space> {
       case INVITED_FILTER: return spaceStorage.getInvitedSpacesByFilterCount(userId, spaceFilter);
       case PENDING: return spaceStorage.getPendingSpacesCount(this.userId);
       case PENDING_FILTER: return spaceStorage.getPendingSpacesByFilterCount(this.userId, this.spaceFilter);
+      case IGNORED: return spaceStorage.getIgnoredSpacesCount(this.userId);
+      case IGNORED_FILTER: return spaceStorage.getIgnoredSpacesByFilterCount(this.userId, this.spaceFilter);
       case PUBLIC: return spaceStorage.getPublicSpacesCount(this.userId);
       case PUBLIC_FILTER: return spaceStorage.getPublicSpacesByFilterCount(this.userId, this.spaceFilter);
       case PUBLIC_SUPER_USER: return 0;

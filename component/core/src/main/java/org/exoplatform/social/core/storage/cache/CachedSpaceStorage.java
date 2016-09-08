@@ -301,6 +301,21 @@ public class CachedSpaceStorage implements SpaceStorage {
   /**
    * {@inheritDoc}
    */
+  public void UpdateSpaceIgnoredList(Space space, String[] userId) {
+    storage.UpdateSpaceIgnoredList(space, userId);
+    exoSpaceSimpleCache.remove(new SpaceKey(space.getId()));
+    SpaceData removed = exoSpaceCache.remove(new SpaceKey(space.getId()));
+
+    clearSpaceCache();
+    clearIdentityCache();
+    if (removed != null) {
+      cleanRef(removed);
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
   public void renameSpace(Space space, String newDisplayName) throws SpaceStorageException {
     renameSpace(null, space, newDisplayName);
   }
@@ -599,6 +614,32 @@ public class CachedSpaceStorage implements SpaceStorage {
 
   }
 
+  @Override
+  public int getIgnoredSpacesCount(String userId) throws SpaceStorageException {
+    SpaceFilterKey key = new SpaceFilterKey(userId, null, SpaceType.IGNORED);
+    return spacesCountCache.get(
+        new ServiceContext<IntegerData>() {
+          public IntegerData execute() {
+            return new IntegerData(storage.getIgnoredSpacesCount(userId));
+          }
+        },
+        key)
+        .build();
+  }
+
+  @Override
+  public int getIgnoredSpacesByFilterCount(String userId, SpaceFilter spaceFilter) {
+    SpaceFilterKey key = new SpaceFilterKey(userId, spaceFilter, SpaceType.IGNORED);
+    return spacesCountCache.get(
+        new ServiceContext<IntegerData>() {
+          public IntegerData execute() {
+            return new IntegerData(storage.getIgnoredSpacesByFilterCount(userId, spaceFilter));
+          }
+        },
+        key)
+        .build();
+  }
+
   /**
    * {@inheritDoc}
    */
@@ -629,6 +670,48 @@ public class CachedSpaceStorage implements SpaceStorage {
     //
     return buildSpaces(keys);
 
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public List<Space> getIgnoredSpaces(final String userId, final long offset, final long limit) throws SpaceStorageException {
+    SpaceFilterKey key = new SpaceFilterKey(userId, null, SpaceType.IGNORED);
+    ListSpacesKey listKey = new ListSpacesKey(key, offset, limit);
+    ListSpacesData keys = spacesCache.get(
+        new ServiceContext<ListSpacesData>() {
+          public ListSpacesData execute() {
+            List<Space> got = storage.getIgnoredSpaces(userId, offset, limit);
+            return buildIds(got);
+          }
+        },
+        listKey);
+    return buildSpaces(keys);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public List<Space> getIgnoredSpaces(final String userId) throws SpaceStorageException {
+    return storage.getIgnoredSpaces(userId);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public List<Space> getIgnoredSpacesByFilter(
+      final String userId, final SpaceFilter spaceFilter, final long offset, final long limit) {
+    SpaceFilterKey key = new SpaceFilterKey(userId, spaceFilter, SpaceType.IGNORED);
+    ListSpacesKey listKey = new ListSpacesKey(key, offset, limit);
+    ListSpacesData keys = spacesCache.get(
+        new ServiceContext<ListSpacesData>() {
+          public ListSpacesData execute() {
+            List<Space> got = storage.getIgnoredSpacesByFilter(userId, spaceFilter, offset, limit);
+            return buildIds(got);
+          }
+        },
+        listKey);
+    return buildSpaces(keys);
   }
 
   /**
@@ -1343,22 +1426,8 @@ public class CachedSpaceStorage implements SpaceStorage {
   public List<Space> getLastSpaces(final int limit) {
      SpaceFilter filter = new SpaceFilter(null, null);
      filter.setSorting(new Sorting(Sorting.SortBy.DATE, Sorting.OrderBy.DESC));
-
-     SpaceFilterKey key = new SpaceFilterKey(null, filter, null);
-     ListSpacesKey listKey = new ListSpacesKey(key, 0, limit);
-
-     //
-     ListSpacesData keys = spacesCache.get(
-         new ServiceContext<ListSpacesData>() {
-           public ListSpacesData execute() {
-             List<Space> got = storage.getLastSpaces(limit);
-             return buildIds(got);
-           }
-         },
-         listKey);
-
-     //
-     return buildSimpleSpaces(keys);
+     List<Space> got = storage.getLastSpaces(limit);
+    return got;
   }
 
   @Override

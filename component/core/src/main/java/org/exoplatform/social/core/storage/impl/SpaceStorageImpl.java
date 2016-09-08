@@ -51,22 +51,11 @@ import org.exoplatform.social.core.storage.query.QueryFunction;
 import org.exoplatform.social.core.storage.query.WhereExpression;
 import org.exoplatform.social.core.storage.streams.StreamInvocationHelper;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
 import javax.jcr.Node;
 import javax.jcr.Property;
 import javax.jcr.RepositoryException;
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * Space storage layer.
@@ -119,6 +108,7 @@ public class SpaceStorageImpl extends AbstractStorage implements SpaceStorage {
     space.setUrl(entity.getURL());
     space.setPendingUsers(entity.getPendingMembersId());
     space.setInvitedUsers(entity.getInvitedMembersId());
+    space.setIgnoredUsers(entity.getIgnoredMembersId());
     space.setCreatedTime(entity.getCreatedTime());
 
     //
@@ -168,6 +158,7 @@ public class SpaceStorageImpl extends AbstractStorage implements SpaceStorage {
     space.setGroupId(entity.getGroupId());
     space.setUrl(entity.getURL());
     space.setCreatedTime(entity.getCreatedTime());
+    space.setIgnoredUsers(entity.getIgnoredMembersId());
 
     if (entity.getAvatarLastUpdated() != null) {
       try {
@@ -211,6 +202,7 @@ public class SpaceStorageImpl extends AbstractStorage implements SpaceStorage {
     entity.setManagerMembersId(space.getManagers());
     entity.setPendingMembersId(space.getPendingUsers());
     entity.setInvitedMembersId(space.getInvitedUsers());
+    entity.setIgnoredMembersId(space.getIgnoredUsers());
     entity.setAvatarLastUpdated(space.getAvatarLastUpdated());
     entity.setCreatedTime(space.getCreatedTime() != 0 ? space.getCreatedTime() : System.currentTimeMillis());
   }
@@ -285,6 +277,20 @@ public class SpaceStorageImpl extends AbstractStorage implements SpaceStorage {
         space.setPendingUsers(ids);
       }
     },
+    IGNORED() {
+      @Override
+      public SpaceListEntity refsOf(IdentityEntity identityEntity) {
+        return identityEntity.getIgnoredSpaces();
+      }
+      @Override
+      public String[] idsOf(Space space) {
+        return space.getIgnoredUsers();
+      }
+      @Override
+      public void setIds(Space space, String[] ids) {
+        space.setIgnoredUsers(ids);
+      }
+    },
     INVITED() {
       @Override
       public SpaceListEntity refsOf(IdentityEntity identityEntity) {
@@ -344,11 +350,13 @@ public class SpaceStorageImpl extends AbstractStorage implements SpaceStorage {
     String[] removedManagers = sub(spaceEntity.getManagerMembersId(), space.getManagers());
     String[] removedInvited = sub(spaceEntity.getInvitedMembersId(), space.getInvitedUsers());
     String[] removedPending = sub(spaceEntity.getPendingMembersId(), space.getPendingUsers());
+    String[] removedIgnored = sub(spaceEntity.getIgnoredMembersId(), space.getIgnoredUsers());
 
     String[] addedMembers = sub(space.getMembers(), spaceEntity.getMembersId());
     String[] addedManagers = sub(space.getManagers(), spaceEntity.getManagerMembersId());
     String[] addedInvited = sub(space.getInvitedUsers(), spaceEntity.getInvitedMembersId());
     String[] addedPending = sub(space.getPendingUsers(), spaceEntity.getPendingMembersId());
+    String[] addedIgnored = sub(space.getIgnoredUsers(), spaceEntity.getIgnoredMembersId());
 
     manageRefList(new UpdateContext(addedMembers, removedMembers), spaceEntity, RefType.MEMBER);
     manageActivityRefList(new UpdateContext(addedMembers, removedMembers), spaceEntity, RefType.MEMBER);
@@ -356,6 +364,7 @@ public class SpaceStorageImpl extends AbstractStorage implements SpaceStorage {
     manageRefList(new UpdateContext(addedManagers, removedManagers), spaceEntity, RefType.MANAGER);
     manageRefList(new UpdateContext(addedInvited, removedInvited), spaceEntity, RefType.INVITED);
     manageRefList(new UpdateContext(addedPending, removedPending), spaceEntity, RefType.PENDING);
+    manageRefList(new UpdateContext(addedIgnored, removedIgnored), spaceEntity, RefType.IGNORED);
 
   }
 
@@ -368,6 +377,8 @@ public class SpaceStorageImpl extends AbstractStorage implements SpaceStorage {
       listUserNames = spaceEntity.getManagerMembersId();
     } else if (RefType.INVITED.equals(type)) {
       listUserNames = spaceEntity.getInvitedMembersId();
+    } else if (RefType.IGNORED.equals(type)) {
+      listUserNames = spaceEntity.getIgnoredMembersId();
     } else {
       listUserNames = spaceEntity.getPendingMembersId();
     }
@@ -642,11 +653,12 @@ public class SpaceStorageImpl extends AbstractStorage implements SpaceStorage {
     }
 
     builder.where(whereExpression
-        .not().equals(SpaceEntity.membersId, userId)
-        .and().not().equals(SpaceEntity.managerMembersId, userId)
-        .and().not().equals(SpaceEntity.invitedMembersId, userId)
-        .and().not().equals(SpaceEntity.pendingMembersId, userId)
-        .toString()
+            .not().equals(SpaceEntity.membersId, userId)
+            .and().not().equals(SpaceEntity.managerMembersId, userId)
+            .and().not().equals(SpaceEntity.invitedMembersId, userId)
+            .and().not().equals(SpaceEntity.pendingMembersId, userId)
+            .and().not().equals(SpaceEntity.ignoredMembersId, userId)
+            .toString()
     );
 
     if (whereExpression.toString().length() > 0) {
@@ -670,6 +682,7 @@ public class SpaceStorageImpl extends AbstractStorage implements SpaceStorage {
         .and().not().equals(SpaceEntity.managerMembersId, userId)
         .and().not().equals(SpaceEntity.invitedMembersId, userId)
         .and().not().equals(SpaceEntity.pendingMembersId, userId)
+        .and().not().equals(SpaceEntity.ignoredMembersId, userId)
         .toString()
     );
 
@@ -693,6 +706,7 @@ public class SpaceStorageImpl extends AbstractStorage implements SpaceStorage {
         .and().not().equals(SpaceEntity.visibility, Space.HIDDEN)
         .and().not().equals(SpaceEntity.invitedMembersId, userId)
         .and().not().equals(SpaceEntity.pendingMembersId, userId)
+        .and().not().equals(SpaceEntity.ignoredMembersId, userId)
         .toString()
     );
 
@@ -719,6 +733,31 @@ public class SpaceStorageImpl extends AbstractStorage implements SpaceStorage {
     builder.where(whereExpression
         .equals(SpaceEntity.pendingMembersId, userId)
         .toString()
+    );
+
+    if (whereExpression.toString().length() > 0) {
+      builder.where(whereExpression.toString());
+    }
+
+    applyOrder(builder, spaceFilter);
+
+    return builder.get();
+
+  }
+
+  private Query<SpaceEntity> getIgnoredSpacesFilterQuery(String userId, SpaceFilter spaceFilter) {
+
+    QueryBuilder<SpaceEntity> builder = getSession().createQueryBuilder(SpaceEntity.class);
+    WhereExpression whereExpression = new WhereExpression();
+
+    if (validateFilter(spaceFilter)) {
+      _applyFilter(whereExpression, spaceFilter);
+      whereExpression.and();
+    }
+
+    builder.where(whereExpression
+            .equals(SpaceEntity.ignoredMembersId, userId)
+            .toString()
     );
 
     if (whereExpression.toString().length() > 0) {
@@ -874,6 +913,7 @@ public class SpaceStorageImpl extends AbstractStorage implements SpaceStorage {
       this.changeSpaceRef(entity, space, RefType.MEMBER);
       this.changeSpaceRef(entity, space, RefType.MANAGER);
       this.changeSpaceRef(entity, space, RefType.INVITED);
+      this.changeSpaceRef(entity, space, RefType.IGNORED);
       this.changeSpaceRef(entity, space, RefType.PENDING);
       
       if (remoteId != null) {
@@ -912,7 +952,21 @@ public class SpaceStorageImpl extends AbstractStorage implements SpaceStorage {
       throw new SpaceStorageException(SpaceStorageException.Type.FAILED_TO_RENAME_SPACE, e.getMessage(), e);
     }
   }
-  
+
+  public void UpdateSpaceIgnoredList(Space space, String[] userId) {
+    try {
+      space.setPrettyName(space.getDisplayName());
+      space.setUrl(SpaceUtils.cleanString(space.getDisplayName()));
+      SpaceEntity entity = _saveSpace(space);
+      space.setIgnoredUsers(userId);
+      fillEntityFromSpace(space, entity);
+      fillSpaceSimpleFromEntity(entity, space);
+      getSession().save();
+    } catch (NodeNotFoundException e) {
+      LOG.error("Exception when ignore a Space" + e.getMessage());
+    }
+  }
+
   /**
    * Add this method to resolve SOC-3439
    * @param identity
@@ -1146,6 +1200,34 @@ public class SpaceStorageImpl extends AbstractStorage implements SpaceStorage {
   /**
    * {@inheritDoc}
    */
+  public int getIgnoredSpacesCount(String userId) throws SpaceStorageException {
+
+    try {
+      IdentityEntity identityEntity = identityStorage._findIdentityEntity(OrganizationIdentityProvider.NAME, userId);
+      Collection<SpaceRef> spaceEntities = identityEntity.getIgnoredSpaces().getRefs().values();
+      return spaceEntities.size();
+    }
+    catch (NodeNotFoundException e) {
+      return 0;
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public int getIgnoredSpacesByFilterCount(String userId, SpaceFilter spaceFilter) {
+
+    if (validateFilter(spaceFilter)) {
+      return getIgnoredSpacesFilterQuery(userId, spaceFilter).objects().size();
+    }
+    else {
+      return 0;
+    }
+  }
+
+  /**
+   * {@inheritDoc}
+   */
   public int getInvitedSpacesByFilterCount(String userId, SpaceFilter spaceFilter) {
 
     if (validateFilter(spaceFilter)) {
@@ -1175,6 +1257,52 @@ public class SpaceStorageImpl extends AbstractStorage implements SpaceStorage {
 
     return spaces;
   }
+
+  /**
+   * {@inheritDoc}
+   */
+  public List<Space> getIgnoredSpaces(String userId) throws SpaceStorageException {
+    List<Space> spaces = new ArrayList<Space>();
+    QueryResult<SpaceEntity> results = getIgnoredSpacesFilterQuery(userId, null).objects();
+    while (results.hasNext()) {
+      SpaceEntity currentSpace = results.next();
+      Space space = new Space();
+      fillSpaceFromEntity(currentSpace, space);
+      spaces.add(space);
+    }
+    return spaces;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public List<Space> getIgnoredSpaces(String userId, long offset, long limit) throws SpaceStorageException {
+    List<Space> spaces = new ArrayList<Space>();
+    QueryResult<SpaceEntity> results = getInvitedSpacesFilterQuery(userId, null).objects(offset, limit);
+    while (results.hasNext()) {
+      SpaceEntity currentSpace = results.next();
+      Space space = new Space();
+      fillSpaceFromEntity(currentSpace, space);
+      spaces.add(space);
+    }
+    return spaces;
+  }
+
+  /**
+   * {@inheritDoc}
+   */
+  public List<Space> getIgnoredSpacesByFilter(String userId, SpaceFilter spaceFilter, long offset, long limit) {
+    List<Space> spaces = new ArrayList<Space>();
+    QueryResult<SpaceEntity> results = getIgnoredSpacesFilterQuery(userId, spaceFilter).objects(offset, limit);
+    while (results.hasNext()) {
+      SpaceEntity currentSpace = results.next();
+      Space space = new Space();
+      fillSpaceFromEntity(currentSpace, space);
+      spaces.add(space);
+    }
+    return spaces;
+  }
+
 
   /**
    * {@inheritDoc}

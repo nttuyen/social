@@ -82,6 +82,11 @@
           <requiredPrimaryType>soc:spaceslist</requiredPrimaryType>
         </requiredPrimaryTypes>
       </childNodeDefinition>
+      <childNodeDefinition name="soc:spaceignoredmember" defaultPrimaryType="soc:spaceslist" autoCreated="false" mandatory="false" onParentVersion="COPY" protected="false" sameNameSiblings="false">
+        <requiredPrimaryTypes>
+          <requiredPrimaryType>soc:spaceslist</requiredPrimaryType>
+        </requiredPrimaryTypes>
+      </childNodeDefinition>
     </childNodeDefinitions>
   </nodeType>
   <!-- Node type generated for the class org.exoplatform.social.core.chromattic.entity.DisabledEntity -->

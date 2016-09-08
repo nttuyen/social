@@ -16,14 +16,6 @@
  */
 package org.exoplatform.social.core.space.impl;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import org.apache.commons.lang.ArrayUtils;
 import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.commons.utils.PageList;
@@ -59,6 +51,14 @@ import org.exoplatform.social.core.space.spi.SpaceService;
 import org.exoplatform.social.core.storage.api.ActivityStreamStorage;
 import org.exoplatform.social.core.storage.api.IdentityStorage;
 import org.exoplatform.social.core.storage.api.SpaceStorage;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
 
 /**
  * {@link org.exoplatform.social.core.space.spi.SpaceService} implementation.
@@ -1325,6 +1325,21 @@ public class SpaceServiceImpl implements SpaceService {
   /**
    * {@inheritDoc}
    */
+  public ListAccess<Space> getIgnoredSpacesWithListAccess(String userId) {
+    return new SpaceListAccess(this.spaceStorage, userId, SpaceListAccess.Type.IGNORED);
+  }
+
+
+  /**
+   * {@inheritDoc}
+   */
+  public ListAccess<Space> getIgnoredSpacesByFilter(String userId, SpaceFilter spaceFilter) {
+    return new SpaceListAccess(this.spaceStorage, userId, spaceFilter, SpaceListAccess.Type.IGNORED_FILTER);
+  }
+
+  /**
+   * {@inheritDoc}
+   */
   public ListAccess<Space> getPublicSpacesByFilter(String userId, SpaceFilter spaceFilter) {
     if (userId.equals(getUserACL().getSuperUser())) {
       return new SpaceListAccess(this.spaceStorage, SpaceListAccess.Type.PUBLIC_SUPER_USER);
@@ -1370,6 +1385,10 @@ public class SpaceServiceImpl implements SpaceService {
    */
   public boolean isInvitedUser(Space space, String userId) {
     return ArrayUtils.contains(space.getInvitedUsers(), userId);
+  }
+
+  public boolean isIgnored(Space space, String userId){
+    return ArrayUtils.contains(space.getIgnoredUsers(), userId);
   }
 
   /**
@@ -1450,6 +1469,21 @@ public class SpaceServiceImpl implements SpaceService {
       }
     }
   }
+
+  /**
+   * {@inheritDoc}
+   */
+  public void setIgnored(Space space, String userId, boolean isIgnored) {
+    String[] ignoredUsers = space.getIgnoredUsers();
+    if (isIgnored) {
+      if (!ArrayUtils.contains(ignoredUsers, userId)) {
+        ignoredUsers = (String[]) ArrayUtils.add(ignoredUsers, userId);
+        space.setIgnoredUsers(ignoredUsers);
+        spaceStorage.UpdateSpaceIgnoredList(space, ignoredUsers);
+      }
+    }
+  }
+
 
   /**
    * {@inheritDoc}
