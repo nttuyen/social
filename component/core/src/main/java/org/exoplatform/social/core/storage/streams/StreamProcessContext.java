@@ -119,7 +119,7 @@ public class StreamProcessContext extends ProcessorContextImpl {
   }
   
   public String getActivityId() {
-    return getProperty(ACTIVITY, String.class);
+    return getProperty(ACTIVITY_ID, String.class);
   }
   
   public StreamProcessContext sender(Identity sender) {
