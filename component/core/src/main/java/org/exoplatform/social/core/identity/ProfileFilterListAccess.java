@@ -19,6 +19,8 @@ package org.exoplatform.social.core.identity;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
+
 import org.exoplatform.commons.utils.ListAccess;
 import org.exoplatform.social.common.ListAccessValidator;
 import org.exoplatform.social.common.jcr.Util;
@@ -128,14 +130,16 @@ public class ProfileFilterListAccess implements ListAccess<Identity> {
       default: 
           break;
       }
-    }else {
-      //TODO: Need move follow logic into switch type for consistency logic
+    } else {
       if (profileFilter.getFirstCharacterOfName() != EMPTY_CHARACTER) {
         identities = identityStorage.getIdentitiesByFirstCharacterOfName(providerId, profileFilter, offset,
                                                                          limit, forceLoadProfile);
-      } else {
+      } else if (StringUtils.isNotBlank(profileFilter.getName()) || StringUtils.isNotBlank(profileFilter.getPosition())
+          || StringUtils.isNotBlank(profileFilter.getAll()) || StringUtils.isNotBlank(profileFilter.getCompany())) {
         identities = identityStorage.getIdentitiesForMentions(providerId, profileFilter, offset,
                                                               limit, forceLoadProfile);
+      } else {
+        identities = identityStorage.getIdentitiesByProfileFilter(providerId, profileFilter, offset, limit, forceLoadProfile);
       }
     }
     
