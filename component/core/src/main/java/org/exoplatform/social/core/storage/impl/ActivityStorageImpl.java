@@ -896,7 +896,7 @@ public class ActivityStorageImpl extends AbstractStorage implements ActivityStor
       }
       
       //create refs
-      StreamInvocationHelper.deleteActivity(activityId);;
+      StreamInvocationHelper.deleteActivity(activityId);
 
       //
       _removeById(ActivityEntity.class, activityId);
@@ -908,7 +908,6 @@ public class ActivityStorageImpl extends AbstractStorage implements ActivityStor
 
       //
       //getSession().save();
-      StorageUtils.persist();
 
       //
       LOG.debug(String.format(
