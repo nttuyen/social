@@ -16,10 +16,13 @@
  */
 package org.exoplatform.social.core.storage.cache;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.exoplatform.social.common.service.ProcessContext;
 import org.exoplatform.social.core.activity.model.ExoSocialActivity;
+import org.exoplatform.social.core.chromattic.entity.ActivityEntity;
+import org.exoplatform.social.core.chromattic.entity.ActivityRef;
 import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.storage.api.ActivityStreamStorage;
 import org.exoplatform.social.core.storage.impl.ActivityStreamStorageImpl;
@@ -46,8 +49,8 @@ public class CachedActivityStreamStorage implements ActivityStreamStorage {
   }
 
   @Override
-  public void delete(String activityId) {
-    this.storage.delete(activityId);
+  public void delete(String activityId, Collection<ActivityRef> references, Long oldLastUpdated, boolean hidden) {
+    this.storage.delete(activityId, references, oldLastUpdated, hidden);
   }
   
   @Override

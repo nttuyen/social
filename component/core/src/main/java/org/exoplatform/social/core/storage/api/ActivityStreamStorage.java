@@ -17,11 +17,14 @@
 package org.exoplatform.social.core.storage.api;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 
 import org.exoplatform.social.common.service.ProcessContext;
 import org.exoplatform.social.core.activity.model.ExoSocialActivity;
+import org.exoplatform.social.core.chromattic.entity.ActivityEntity;
+import org.exoplatform.social.core.chromattic.entity.ActivityRef;
 import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.storage.impl.ActivityStreamStorageImpl.ActivityRefType;
 
@@ -91,12 +94,14 @@ public interface ActivityStreamStorage {
   public void save(ProcessContext ctx);
 
   /**
-   * Deletes the activity reference what relates the deleted Activity 
+   * Deletes the activity references related to the deleted Activity
    * @param activityId
    * @since 4.0.2, 4.1.0
    * 
    */
-  public void delete(String activityId);
+  //public void delete(String activityId);
+  
+  public void delete(String activityId, Collection<ActivityRef> references, Long oldLastUpdated, boolean hidden);
   
   /**
    * Likes the activity then push the liked to Liker's streams

@@ -158,7 +158,7 @@ public class StreamProcessorFactory {
       @Override
       protected ProcessContext execute(ProcessContext processContext) throws Exception {
         StreamProcessContext ctx = ObjectHelper.cast(StreamProcessContext.class, processContext);
-        getStreamStorage().delete(ctx.getActivityId());
+        getStreamStorage().delete(ctx.getActivityId(), ctx.getActivityReferences(), ctx.getOldLastUpdated(),ctx.isActivityHidden());
         return processContext;
       }
     };

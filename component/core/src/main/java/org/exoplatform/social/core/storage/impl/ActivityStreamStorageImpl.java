@@ -206,7 +206,7 @@ public class ActivityStreamStorageImpl extends AbstractStorage implements Activi
   /**
   * Making the Activity Reference for the user's connections
   * 
-  * @param owner
+  * @param poster
   * @param activityEntity
   * @throws NodeNotFoundException
   */
@@ -417,15 +417,12 @@ public class ActivityStreamStorageImpl extends AbstractStorage implements Activi
   }
   
   @Override
-  public void delete(String activityId) {
+  public void delete(String activityId, Collection<ActivityRef> references, Long oldLastUpdated, boolean hidden) {
     int counter = 0;
     this.activityWriteLock.lock();
     try {
       //
-      ActivityEntity activityEntity = _findById(ActivityEntity.class, activityId);
-      HidableEntity hidableActivity = _getMixin(activityEntity, HidableEntity.class, true);
       
-      Collection<ActivityRef> references = activityEntity.getActivityRefs();
       
       List<ActivityRefListEntity> refList = new ArrayList<ActivityRefListEntity>(); 
       //
@@ -438,7 +435,7 @@ public class ActivityStreamStorageImpl extends AbstractStorage implements Activi
       for (ActivityRefListEntity list : refList) {
         counter++;
         try {
-          list.remove(activityEntity, hidableActivity.getHidden(), null);
+          list.remove(activityId, oldLastUpdated, hidden);
         } catch (Exception e) {
           LOG.error("An exception when removing a reference", e);
         }
