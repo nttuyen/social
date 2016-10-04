@@ -149,21 +149,7 @@ public class StreamProcessorFactory {
 
     };
   }
-
-  /**
-   +   * Build Delete Activity processor
-   +   */
-  public static SocialChromatticAsyncProcessor deleteActivity() {
-    return new SocialChromatticAsyncProcessor(SocialServiceContextImpl.getInstance()) {
-      @Override
-      protected ProcessContext execute(ProcessContext processContext) throws Exception {
-        StreamProcessContext ctx = ObjectHelper.cast(StreamProcessContext.class, processContext);
-        getStreamStorage().delete(ctx.getActivityId(), ctx.getActivityReferences(), ctx.getOldLastUpdated(),ctx.isActivityHidden());
-        return processContext;
-      }
-    };
-  }
-
+  
   /**
    * Build unlike processor
    * @return

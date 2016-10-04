@@ -16,24 +16,20 @@
  */
 package org.exoplatform.social.core.storage.streams;
 
-import java.util.Collection;
 import java.util.List;
 
 import org.exoplatform.social.common.service.SocialServiceContext;
 import org.exoplatform.social.common.service.impl.ProcessorContextImpl;
 import org.exoplatform.social.core.activity.model.ExoSocialActivity;
 import org.exoplatform.social.core.chromattic.entity.ActivityEntity;
-import org.exoplatform.social.core.chromattic.entity.ActivityRef;
 import org.exoplatform.social.core.identity.model.Identity;
 
 public class StreamProcessContext extends ProcessorContextImpl {
   
-  public static String ACTIVITY_HIDDEN = "ACTIVITY_HIDDEN";
   public static String NEW_ACTIVITY_PROCESS = "NEW_ACTIVITY";
   public static String NEW_ACTIVITY_RELATIONS_PROCESS = "NEW_ACTIVITY_FOR_RELATIONS";
   public static String UPDATE_ACTIVITY_PROCESS = "UPDATE_ACTIVITY";
   public static String UPDATE_ACTIVITY_REF = "UPDATE_ACTIVITY_REF";
-  public static String ACTIVITY_REFERENCES = "ACTIVITY_REFERENCES";
   public static String UPDATE_ACTIVITY_COMMENTER_PROCESS = "UPDATE_ACTIVITY_COMMENTER";
   public static String UPDATE_ACTIVITY_MENTIONER_PROCESS = "UPDATE_ACTIVITY_MENTIONER";
   public static String DELETE_ACTIVITY_PROCESS = "DELETE_ACTIVITY";
@@ -187,22 +183,5 @@ public class StreamProcessContext extends ProcessorContextImpl {
   
   public long getOldLastUpdated() {
     return getProperty(OLD_LAST_UPDATED, long.class);
-  }
-  
-  public boolean isActivityHidden() {
-    return getProperty(ACTIVITY_HIDDEN,Boolean.class);
-  }
-  public StreamProcessContext activityHidden(boolean hidden){
-    setProperty(ACTIVITY_HIDDEN,hidden);
-    return this;
-  }
-  
-  public Collection<ActivityRef> getActivityReferences() {
-    return getProperty(ACTIVITY_REFERENCES, Collection.class);
-  }
-  
-  public  StreamProcessContext activityRefs(Collection<ActivityRef> references) {
-    setProperty(ACTIVITY_REFERENCES, references);
-    return this;
   }
 }

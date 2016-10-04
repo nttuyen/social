@@ -17,7 +17,10 @@
 package org.exoplatform.social.core.chromattic.entity;
 
 import java.text.DateFormatSymbols;
-import java.util.*;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.chromattic.api.annotations.Create;
@@ -301,38 +304,6 @@ public abstract class ActivityRefListEntity {
   }
 
   
-  public ActivityRef remove(String activityId, Long oldLastUpdated, boolean isHidden) {
-    
-    //In some cases, migrated Activity from 3.5.x, ActivityRef's lastUpdated is NULL
-    //uses instead of Activity's postedTime.
-    Calendar calendar = Calendar.getInstance(Locale.ENGLISH);
-    calendar.setTimeInMillis(oldLastUpdated);
-
-    String year = String.valueOf(calendar.get(Calendar.YEAR));
-    String month = MONTH_NAME[calendar.get(Calendar.MONTH)];
-    String day = String.valueOf(calendar.get(Calendar.DAY_OF_MONTH));
-
-    ActivityRefDayEntity dayEntity = this.getYear(year).getMonth(month).getDay(day);
-    
-    //needs to check it existing or not in list
-    ActivityRef ref = dayEntity.getActivityRefs().remove(activityId);
-    
-    //remove by lastUpdated
-    if (ref == null) {
-      ref = dayEntity.getActivityRefs().remove("" + oldLastUpdated);
-    }
-    
-    if (ref != null) {
-      if (!isHidden) {
-        dayEntity.desc();
-      }
-      
-      ref = null;
-    }
-    
-    return ref;
-  }
-  
   public ActivityRef remove(ActivityEntity entity, boolean isHidden, Long oldLastUpdated) {
     Long lastUpdated = oldLastUpdated;
     //In some cases, migrated Activity from 3.5.x, ActivityRef's lastUpdated is NULL
@@ -342,11 +313,11 @@ public abstract class ActivityRefListEntity {
     }
     Calendar calendar = Calendar.getInstance(Locale.ENGLISH);
     calendar.setTimeInMillis(lastUpdated);
-    
+
     String year = String.valueOf(calendar.get(Calendar.YEAR));
     String month = MONTH_NAME[calendar.get(Calendar.MONTH)];
     String day = String.valueOf(calendar.get(Calendar.DAY_OF_MONTH));
-    
+
     ActivityRefDayEntity dayEntity = this.getYear(year).getMonth(month).getDay(day);
     
     //needs to check it existing or not in list

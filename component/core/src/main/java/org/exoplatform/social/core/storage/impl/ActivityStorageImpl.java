@@ -65,7 +65,13 @@ import org.exoplatform.social.core.activity.model.ActivityStream;
 import org.exoplatform.social.core.activity.model.ActivityStreamImpl;
 import org.exoplatform.social.core.activity.model.ExoSocialActivity;
 import org.exoplatform.social.core.activity.model.ExoSocialActivityImpl;
-import org.exoplatform.social.core.chromattic.entity.*;
+import org.exoplatform.social.core.chromattic.entity.ActivityDayEntity;
+import org.exoplatform.social.core.chromattic.entity.ActivityEntity;
+import org.exoplatform.social.core.chromattic.entity.ActivityListEntity;
+import org.exoplatform.social.core.chromattic.entity.ActivityParameters;
+import org.exoplatform.social.core.chromattic.entity.HidableEntity;
+import org.exoplatform.social.core.chromattic.entity.IdentityEntity;
+import org.exoplatform.social.core.chromattic.entity.LockableEntity;
 import org.exoplatform.social.core.chromattic.filter.JCRFilterLiteral;
 import org.exoplatform.social.core.chromattic.utils.ActivityList;
 import org.exoplatform.social.core.identity.model.ActiveIdentityFilter;
@@ -888,13 +894,9 @@ public class ActivityStorageImpl extends AbstractStorage implements ActivityStor
           StreamInvocationHelper.deleteComment(activity, mentioners.toArray(new String[0]), null);
         }
       }
-      HidableEntity hidableActivity = _getMixin(activityEntity, HidableEntity.class, true);
-      boolean hidden =hidableActivity.getHidden();
-      Collection<ActivityRef> references = activityEntity.getActivityRefs();
-      Long oldLastUpdated = activityEntity.getLastUpdated() != null ? activityEntity.getLastUpdated() : activityEntity.getPostedTime();
-  
+      
       //create refs
-      StreamInvocationHelper.deleteActivity(activityId, references, oldLastUpdated, hidden);
+      streamStorage.delete(activityId);
 
       //
       _removeById(ActivityEntity.class, activityId);

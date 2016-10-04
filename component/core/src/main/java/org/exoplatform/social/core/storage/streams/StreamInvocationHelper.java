@@ -16,7 +16,6 @@
  */
 package org.exoplatform.social.core.storage.streams;
 
-import java.util.Collection;
 import java.util.List;
 
 import org.exoplatform.services.log.ExoLogger;
@@ -26,7 +25,6 @@ import org.exoplatform.social.common.service.SocialServiceContext;
 import org.exoplatform.social.common.service.impl.SocialServiceContextImpl;
 import org.exoplatform.social.core.activity.model.ExoSocialActivity;
 import org.exoplatform.social.core.chromattic.entity.ActivityEntity;
-import org.exoplatform.social.core.chromattic.entity.ActivityRef;
 import org.exoplatform.social.core.identity.model.Identity;
 import org.exoplatform.social.core.storage.impl.StorageUtils;
 
@@ -156,23 +154,6 @@ public class StreamInvocationHelper {
       LOG.debug(processCtx.getTraceLog());
     }
     
-    return processCtx;
-  }
-
-  public static  ProcessContext deleteActivity(String activityId, Collection<ActivityRef> references, Long oldLastUpdated, boolean hidden) {
-    SocialServiceContext ctx = SocialServiceContextImpl.getInstance();
-    StreamProcessContext processCtx = StreamProcessContext.getIntance(StreamProcessContext.DELETE_ACTIVITY_PROCESS, ctx);
-    processCtx.activityId(activityId).activityRefs(references).oldLastUpdated(oldLastUpdated).activityHidden(hidden);
-    try {
-      if(ctx.isAsync()) {
-        beforeAsync();
-        ctx.getServiceExecutor().async(StreamProcessorFactory.deleteActivity(), processCtx);
-      } else {
-        ctx.getServiceExecutor().execute(StreamProcessorFactory.deleteActivity(), processCtx);
-      }
-    } finally {
-      LOG.debug(processCtx.getTraceLog());
-    }
     return processCtx;
   }
   

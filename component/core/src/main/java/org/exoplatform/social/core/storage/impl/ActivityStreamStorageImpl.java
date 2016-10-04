@@ -417,12 +417,15 @@ public class ActivityStreamStorageImpl extends AbstractStorage implements Activi
   }
   
   @Override
-  public void delete(String activityId, Collection<ActivityRef> references, Long oldLastUpdated, boolean hidden) {
+  public void delete(String activityId) {
     int counter = 0;
     this.activityWriteLock.lock();
     try {
       //
+      ActivityEntity activityEntity = _findById(ActivityEntity.class, activityId);
+      HidableEntity hidableActivity = _getMixin(activityEntity, HidableEntity.class, true);
       
+      Collection<ActivityRef> references = activityEntity.getActivityRefs();
       
       List<ActivityRefListEntity> refList = new ArrayList<ActivityRefListEntity>(); 
       //
@@ -435,7 +438,7 @@ public class ActivityStreamStorageImpl extends AbstractStorage implements Activi
       for (ActivityRefListEntity list : refList) {
         counter++;
         try {
-          list.remove(activityId, oldLastUpdated, hidden);
+          list.remove(activityEntity, hidableActivity.getHidden(), null);
         } catch (Exception e) {
           LOG.error("An exception when removing a reference", e);
         }
@@ -444,7 +447,9 @@ public class ActivityStreamStorageImpl extends AbstractStorage implements Activi
           counter = 0;
         }
       }
-    } catch (Exception e) {
+      
+      
+    } catch (NodeNotFoundException e) {
       LOG.error("Failed to delete Activities references.", e);
     } finally {
       this.activityWriteLock.unlock();
