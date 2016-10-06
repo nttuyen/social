@@ -103,6 +103,7 @@ public class ActivityStreamStorageImpl extends AbstractStorage implements Activi
 
   /** */
   private static int BATCH = 20;
+  private final int BATCH_DEL_REFS = 50;
   
   public ActivityStreamStorageImpl(IdentityStorageImpl identityStorage) {
     this.identityStorage = identityStorage;
@@ -442,7 +443,7 @@ public class ActivityStreamStorageImpl extends AbstractStorage implements Activi
         } catch (Exception e) {
           LOG.error("An exception when removing a reference", e);
         }
-        if (counter == BATCH) {
+        if (counter == BATCH_DEL_REFS) {
           StorageUtils.persist();
           counter = 0;
         }

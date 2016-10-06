@@ -908,7 +908,7 @@ public class ActivityStorageImpl extends AbstractStorage implements ActivityStor
 
       //
       //getSession().save();
-
+      StorageUtils.persist();
       //
       LOG.debug(String.format(
           "Activity or comment %s by %s (%s) removed",
