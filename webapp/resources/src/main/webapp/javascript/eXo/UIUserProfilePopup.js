@@ -198,10 +198,14 @@
 		                 		}).complete(function (jqXHR) {
 		                     		if (jqXHR.readyState === 4) {
 		                       			var userData = $.parseJSON(jqXHR.responseText);
+
 		                       			if (!userData) {
 		                         			ajaxCall();
 		                       			}
+
+		                       			//
 		                       			putToCache(userId, userData);
+
 		                                buildPopup(userData, userId);
 		                     		}
 		                 	    });
