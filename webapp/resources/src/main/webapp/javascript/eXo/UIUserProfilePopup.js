@@ -2,7 +2,7 @@
  * Component displaying a popup with the user profile info and some actions.
  */
 (function ($) {
-    var previousUserId = null;
+     var previousUserId = null;
      $.fn.userPopup = function (options) {
          var defaults = {
              restURL: "",
@@ -191,24 +191,24 @@
                    var restUrl = opts.restURL.replace('{0}', window.encodeURI(userId));
                    
                    function ajaxCall() {
-                     		$.ajax({
-		                	     type: "GET",
-		                    	 cache: false,
-		                     	url: restUrl
-		                 		}).complete(function (jqXHR) {
-		                     		if (jqXHR.readyState === 4) {
-		                       			var userData = $.parseJSON(jqXHR.responseText);
+                       $.ajax({
+                           type: "GET",
+                           cache: false,
+                           url: restUrl
+                       }).complete(function (jqXHR) {
+                           if (jqXHR.readyState === 4) {
+                               var userData = $.parseJSON(jqXHR.responseText);
 
-		                       			if (!userData) {
-		                         			ajaxCall();
-		                       			}
+                               if (!userData) {
+                                   ajaxCall();
+                               }
 
-		                       			//
-		                       			putToCache(userId, userData);
+                               //
+                               putToCache(userId, userData);
 
-		                                buildPopup(userData, userId);
-		                     		}
-		                 	    });
+                               buildPopup(userData, userId);
+                           }
+                       });
                      	}
                    //
                    initPopup();
@@ -222,11 +222,11 @@
                      if (window.profileXHR && window.profileXHR.abort) {
                        window.profileXHR.abort();
                      }
-                    if (previousUserId != userId) {
-                        window.profileXHR = ajaxCall();
+                     if (previousUserId != userId) {
+                       window.profileXHR = ajaxCall();
                      }
                      previousUserId = userId;
-		            }
+                   }
                  }
                  
                  function initPopup() {
