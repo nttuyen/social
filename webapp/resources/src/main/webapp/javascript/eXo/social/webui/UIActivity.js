@@ -310,8 +310,9 @@ var UIActivity = {
     },1200);
   },
   hideLink : function() {
-    $('textarea#composerInput').exoMentions('reset');
-    var container = $('#ComposerContainer')
+    //$('textarea#composerInput').exoMentions('reset');
+    CKEDITOR.instances["composerInput"].setData('');
+    var container = $('#ComposerContainer');
     var link = container.find('#LinkExtensionContainer');
     if (link.length > 0) {
       if (link.css('display') !== 'none') {
@@ -365,14 +366,16 @@ var UIActivity = {
           hidenComposer($(this));
         });
         //
-        composer.find('textarea#composerInput').exoMentions('registerControlButton', function(status) {
+        CKEDITOR.instances["composerInput"].focus();
+
+        /*composer.find('textarea#composerInput').exoMentions('registerControlButton', function(status) {
           var btnSubmit = $('#' + UIActivity.responsiveId).find('.uiComposer:first').find('.btn-submit');
           if(status === true) {
             btnSubmit.removeAttr('disabled');
           } else {
             btnSubmit.prop('disabled', true);
           }
-        });
+        });*/
       });
       //
       var btnGroup = root.find('.button-group');
