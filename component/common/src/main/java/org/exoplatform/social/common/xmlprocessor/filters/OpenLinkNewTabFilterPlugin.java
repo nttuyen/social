@@ -28,6 +28,12 @@ import java.util.LinkedList;
 import java.util.List;
 
 /**
+ * This OpenLinkNewTabFilterPlugin is a plugin for XMLProcessor which will force all links have to be open in new tab.
+ * It will set attribute target="_blank" if this attribute is omitted or had other value.
+ * For example:
+ * {@literal <a href="http://abc.com">abc</a> => <a href="http://abc.com" target="_blank">abc</a>}
+ * {@literal <a href="http://abc.com" target="frame_name">abc</a> => <a href="http://abc.com" target="_blank">abc</a>}
+ *
  * @author <a href="mailto:tuyennt@exoplatform.com">Tuyen Nguyen The</a>.
  */
 public class OpenLinkNewTabFilterPlugin extends BaseXMLFilterPlugin {
