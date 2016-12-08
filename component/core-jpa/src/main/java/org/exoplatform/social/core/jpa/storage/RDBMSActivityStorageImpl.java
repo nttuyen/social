@@ -351,31 +351,31 @@ public class RDBMSActivityStorageImpl extends ActivityStorageImpl {
       
       ActivityEntity commentEntity = convertCommentToCommentEntity(eXoComment);
       commentEntity.setParent(activityEntity);
-      //
-      Identity commenter = identityStorage.findIdentityById(commentEntity.getPosterId());
-      saveStreamItemForCommenter(commenter, activityEntity);
-      mention(commenter, activityEntity, processMentions(eXoComment.getTitle()));
-      //
-      activityEntity.addComment(commentEntity);
       commentEntity = activityDAO.create(commentEntity);
+
       eXoComment.setId(getExoCommentID(commentEntity.getId()));
       Set<String> mentioned = commentEntity.getMentionerIds();
       if (mentioned != null && !mentioned.isEmpty()) {
         eXoComment.setMentionedIds(mentioned.toArray(new String[mentioned.size()]));
       }
+
       //
+      Identity commenter = identityStorage.findIdentityById(commentEntity.getPosterId());
+      saveStreamItemForCommenter(commenter, activityEntity);
+      mention(commenter, activityEntity, processMentions(eXoComment.getTitle()));
+
+      //
+      activityEntity.addComment(commentEntity);
       activityEntity.setMentionerIds(processMentionOfComment(activityEntity, commentEntity, activity.getMentionedIds(), processMentions(eXoComment.getTitle()), true));
+
       if (eXoComment.getUpdated() != null) {
         activityEntity.setUpdatedDate(eXoComment.getUpdated());
       } else {
         activityEntity.setUpdatedDate(new Date());
       }
-      activityDAO.update(activityEntity);
-      //
-      updateLastUpdatedForStreamItem(activityEntity);
 
-      //
-      //activity = convertActivityEntityToActivity(activityEntity);
+      activityDAO.updateLastUpdated(activityEntity);
+
     } finally {
       EntityManagerHolder.get().lock(activityEntity, LockModeType.NONE);
     }
@@ -391,14 +391,6 @@ public class RDBMSActivityStorageImpl extends ActivityStorageImpl {
     Identity ownerActivity = identityStorage.findIdentityById(activityEntity.getOwnerId());
     if (! SpaceIdentityProvider.NAME.equals(ownerActivity.getProviderId())) {
       createStreamItem(StreamType.COMMENTER, activityEntity, Long.parseLong(commenter.getId()));
-    }
-  }
-
-  private void updateLastUpdatedForStreamItem(ActivityEntity activity) {
-    List<StreamItemEntity> items = streamItemDAO.findStreamItemByActivityId(activity.getId());
-    for (StreamItemEntity item : items) {
-      item.setUpdatedDate(activity.getUpdatedDate());
-      streamItemDAO.update(item);
     }
   }
 
@@ -524,6 +516,9 @@ public class RDBMSActivityStorageImpl extends ActivityStorageImpl {
     }
     if (!isExist) {
       activity.addStreamItem(streamItem);
+      if (activity.getId() != null && activity.getId() > 0) {
+        streamItemDAO.create(streamItem);
+      }
     }
   }
   

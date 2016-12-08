@@ -25,6 +25,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
 import javax.persistence.Query;
 import javax.persistence.Tuple;
@@ -781,8 +782,24 @@ public class ActivityDAOImpl extends GenericDAOJPAImpl<ActivityEntity, Long> imp
     query.executeUpdate();
   }
 
+  @Override
+  public void updateLastUpdated(ActivityEntity entity) {
+    if (entity.getUpdatedDate() == null) return;
+    
+    EntityManager em = getEntityManager();
+    Query query = em.createNamedQuery("SocActivity.updateLastUpdated");
+    query.setParameter("updatedDate", entity.getUpdatedDate().getTime());
+    query.setParameter("id", entity.getId());
+    query.executeUpdate();
+
+    query = em.createNamedQuery("SocStreamItem.updateLastUpdated");
+    query.setParameter("updatedDate", entity.getUpdatedDate().getTime());
+    query.setParameter("activityId", entity.getId());
+    query.executeUpdate();
+  }
+
   public List<ActivityEntity> getOwnerActivities(List<String> owners, long newerTime, long olderTime,
-                                                long offset, long limit) throws ActivityStorageException {
+                                                 long offset, long limit) throws ActivityStorageException {
 
     TypedQuery<ActivityEntity> query;
 

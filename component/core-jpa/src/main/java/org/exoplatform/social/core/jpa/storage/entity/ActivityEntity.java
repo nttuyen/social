@@ -231,7 +231,9 @@ import org.exoplatform.commons.api.persistence.ExoEntity;
                     + " item.streamType = :connStreamType "
                     + " ORDER BY item.activity.updatedDate DESC"),
         @NamedQuery(name = "SocActivity.deleteActivityByOwner",
-                query = "DELETE FROM SocActivity a WHERE a.ownerId = :ownerId ")
+                query = "DELETE FROM SocActivity a WHERE a.ownerId = :ownerId "),
+        @NamedQuery(name = "SocActivity.updateLastUpdated",
+                query = "UPDATE SocActivity a SET a.updatedDate = :updatedDate WHERE a.id = :id")
 })
 public class ActivityEntity implements Serializable {
 

@@ -31,7 +31,8 @@ import javax.persistence.*;
 @Table(name = "SOC_STREAM_ITEMS")
 @NamedQueries({
         @NamedQuery(name = "SocStreamItem.migrateOwner", query = "UPDATE SocStreamItem s SET s.ownerId = :newId WHERE s.ownerId = :oldId"),
-        @NamedQuery(name = "getStreamByActivityId", query = "select s from SocStreamItem s join s.activity A where A.id = :activityId")
+        @NamedQuery(name = "getStreamByActivityId", query = "select s from SocStreamItem s join s.activity A where A.id = :activityId"),
+        @NamedQuery(name = "SocStreamItem.updateLastUpdated", query = "UPDATE SocStreamItem s SET s.updatedDate = :updatedDate WHERE s.activityId = :activityId")
 })
 public class StreamItemEntity {
 

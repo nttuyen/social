@@ -429,4 +429,6 @@ public interface ActivityDAO extends GenericDAO<ActivityEntity, Long> {
    */
   void deleteActivitiesByOwnerId(String ownerId);
 
+  void updateLastUpdated(ActivityEntity entity);
+
 }
